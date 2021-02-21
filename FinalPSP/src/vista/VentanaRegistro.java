@@ -5,13 +5,18 @@
  */
 package vista;
 
+import finalpsp.Constantes;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -25,15 +30,20 @@ public class VentanaRegistro extends javax.swing.JFrame {
     public VentanaRegistro() {
         initComponents();
         setValuesToSpinner();
-        setIconImage();
-        spEdad.setValue(18);
-
+        setIconImage(Constantes.RUTA_IMA_USER);
+       
+    }
+    
+    private void setValuesPrefs() {
+        lblArte.setText(sldArte.getValue()+"");
+        lblDeporte.setText(sldDeporte.getValue()+"");
+        lblPolitica.setText(sldPolitica.getValue()+"");
     }
 
-    public void setIconImage() {
+    public void setIconImage(String ruta) {
         try {
             
-            File im = new File(".\\src\\Images\\userImage.png");
+            File im = new File(ruta);
             BufferedImage img = ImageIO.read(im);
             Image dimg = img.getScaledInstance(lblImaUser.getWidth(), lblImaUser.getHeight(),
             Image.SCALE_SMOOTH);
@@ -50,7 +60,47 @@ public class VentanaRegistro extends javax.swing.JFrame {
         spModel.setMaximum(99);
         spModel.setMinimum(18);
         spEdad.setModel(spModel);
+        spEdad.setValue(18);
     }
+    
+    public boolean checkDatos(){
+        boolean ok = true;
+        if (txtNick.getText().isEmpty() ||
+            txtEmail.getText().isEmpty() ||
+            txtPass1.getPassword().length == 0 ||
+            txtPass2.getPassword().length == 0) {
+            ok = false;
+        }
+        return ok;
+    }
+    
+    public boolean checkPrefs(){
+        boolean ok = true;
+        if (cbGeneros.getSelectedIndex() == 0 ||
+            cbRelacion.getSelectedIndex() == 0 ||
+            cbTHijos.getSelectedIndex() == 0 ||
+            cbQHijos.getSelectedIndex() == 0) {
+            ok = false;
+        }
+        return ok;
+    }
+    
+    public boolean checkPass(){
+        boolean ok = false;
+        if (Arrays.equals(txtPass1.getPassword(), txtPass2.getPassword())) {
+            ok = true;
+        }
+        return ok;
+    }
+    
+    public boolean checkEmail(){
+        boolean ok = false;
+        return ok;
+    }
+    
+    
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -61,6 +111,7 @@ public class VentanaRegistro extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFileChooser1 = new javax.swing.JFileChooser();
         pnlDatosUser = new javax.swing.JPanel();
         btnFoto = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -95,13 +146,18 @@ public class VentanaRegistro extends javax.swing.JFrame {
         lblPolitica = new javax.swing.JLabel();
         sldPolitica = new javax.swing.JSlider();
         sldArte = new javax.swing.JSlider();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnRegistrar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         btnFoto.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnFoto.setText("Elegir foto");
+        btnFoto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFotoActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel1.setText("Email:");
@@ -148,6 +204,12 @@ public class VentanaRegistro extends javax.swing.JFrame {
 
         cbGeneros.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecciona una", "Hombres", "Mujeres", "Ambos" }));
 
+        sldDeporte.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sldDeporteStateChanged(evt);
+            }
+        });
+
         cbRelacion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecciona una", "Seria", "Esporádica" }));
 
         jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -175,19 +237,31 @@ public class VentanaRegistro extends javax.swing.JFrame {
         lblPolitica.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblPolitica.setText("50");
 
-        jButton2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton2.setText("Registrarse");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+        sldPolitica.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sldPoliticaStateChanged(evt);
             }
         });
 
-        jButton3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton3.setText("Cancelar");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        sldArte.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sldArteStateChanged(evt);
+            }
+        });
+
+        btnRegistrar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnRegistrar.setText("Registrarse");
+        btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnRegistrarActionPerformed(evt);
+            }
+        });
+
+        btnCancelar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
             }
         });
 
@@ -221,9 +295,9 @@ public class VentanaRegistro extends javax.swing.JFrame {
                         .addGap(94, 94, 94)
                         .addGroup(pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(pnlPrefsUserLayout.createSequentialGroup()
-                                .addComponent(jButton2)
+                                .addComponent(btnRegistrar)
                                 .addGap(37, 37, 37)
-                                .addComponent(jButton3))
+                                .addComponent(btnCancelar))
                             .addGroup(pnlPrefsUserLayout.createSequentialGroup()
                                 .addGroup(pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel11)
@@ -281,8 +355,8 @@ public class VentanaRegistro extends javax.swing.JFrame {
                             .addComponent(sldArte, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
                 .addGroup(pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(btnRegistrar)
+                    .addComponent(btnCancelar))
                 .addGap(37, 37, 37))
         );
 
@@ -378,57 +452,63 @@ public class VentanaRegistro extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void sldDeporteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sldDeporteStateChanged
+        setValuesPrefs();
+    }//GEN-LAST:event_sldDeporteStateChanged
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void sldArteStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sldArteStateChanged
+        setValuesPrefs();
+    }//GEN-LAST:event_sldArteStateChanged
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VentanaRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VentanaRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VentanaRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(VentanaRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    private void sldPoliticaStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sldPoliticaStateChanged
+        setValuesPrefs();
+    }//GEN-LAST:event_sldPoliticaStateChanged
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnCancelarActionPerformed
+
+    private void btnFotoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFotoActionPerformed
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Images", "jpg","png");
+        jFileChooser1.addChoosableFileFilter(filter);
+        int result = jFileChooser1.showSaveDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedImage = jFileChooser1.getSelectedFile();
+            String path = selectedImage.getAbsolutePath();
+            setIconImage(path);
         }
-        //</editor-fold>
+    }//GEN-LAST:event_btnFotoActionPerformed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new VentanaRegistro().setVisible(true);
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
+        
+        if (checkDatos()) {
+            if (checkPass()) {
+                if (checkPrefs()) {
+                    
+                    JOptionPane.showMessageDialog(null,"OK");
+                    
+                }else{
+                    JOptionPane.showMessageDialog(null,"Debes marcar todas las preferencias");
+                }
+            }else{
+                JOptionPane.showMessageDialog(null,"Las contraseñas no son iguales");
             }
-        });
-    }
+        }else{
+            JOptionPane.showMessageDialog(null,"Debes rellenar todos los datos de usuario");
+        }
+        
+    }//GEN-LAST:event_btnRegistrarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnFoto;
+    private javax.swing.JButton btnRegistrar;
     private javax.swing.JComboBox<String> cbGeneros;
     private javax.swing.JComboBox<String> cbQHijos;
     private javax.swing.JComboBox<String> cbRelacion;
     private javax.swing.JComboBox<String> cbTHijos;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -459,4 +539,6 @@ public class VentanaRegistro extends javax.swing.JFrame {
     private javax.swing.JPasswordField txtPass1;
     private javax.swing.JPasswordField txtPass2;
     // End of variables declaration//GEN-END:variables
+
+
 }
