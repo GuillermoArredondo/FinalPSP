@@ -5,12 +5,29 @@
  */
 package vista;
 
+import Datos.Usuario;
+import Utilities.Comunicacion;
+import Utilities.Seguridad;
 import finalpsp.Constantes;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
+import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -24,14 +41,22 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class VentanaRegistro extends javax.swing.JFrame {
 
-    /**
-     * Creates new form VentanaRegistro
-     */
-    public VentanaRegistro() {
+    private Socket servidor;
+    private PrivateKey clavePrivPropia;
+    private PublicKey clavePubAjena;
+    private String path;
+    private byte[] dataImage;
+    private File selectedImage;
+    
+    public VentanaRegistro(PrivateKey clavePrivPropia, PublicKey clavePubAjena, Socket servidor) throws IOException {
+        this.clavePrivPropia = clavePrivPropia;
+        this.clavePubAjena = clavePubAjena;
+        this.servidor = servidor;
+        
         initComponents();
         setValuesToSpinner();
         setIconImage(Constantes.RUTA_IMA_USER);
-       
+        crearImagen();
     }
     
     private void setValuesPrefs() {
@@ -98,8 +123,45 @@ public class VentanaRegistro extends javax.swing.JFrame {
         return ok;
     }
     
+    private Usuario crearUsuario() throws NoSuchAlgorithmException {
+        char th = 'N';
+        char qh = 'N';
+        if (cbTHijos.getSelectedIndex() == 1) {
+            th = 'S';
+        }
+        if (cbQHijos.getSelectedIndex() == 1) {
+            qh = 'S';
+        }
+        
+        byte[] pass = resumirPwd();
+        
+        return new Usuario(txtEmail.getText(), pass,
+                txtNick.getText(), (int) spEdad.getValue(), null, 
+                cbGeneros.getSelectedIndex(),
+                cbRelacion.getSelectedIndex(),
+                th, qh, sldDeporte.getValue(),
+                sldArte.getValue(), sldPolitica.getValue());
+    }
+
+    private void crearImagen() throws IOException {
+        
+        if (selectedImage == null) {
+            this.selectedImage = new File(Constantes.RUTA_IMA_USER);
+        }else{
+            BufferedImage bImage = ImageIO.read(selectedImage);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ImageIO.write(bImage, "png", bos );
+            this.dataImage = bos.toByteArray();
+        }  
+    }
     
     
+    private byte[] resumirPwd() throws NoSuchAlgorithmException{
+        char[] pass = txtPass1.getPassword();
+        String passStr = new String(pass);
+        
+        return Seguridad.resumirPwd(passStr);
+    }
     
 
     /**
@@ -473,8 +535,8 @@ public class VentanaRegistro extends javax.swing.JFrame {
         jFileChooser1.addChoosableFileFilter(filter);
         int result = jFileChooser1.showSaveDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedImage = jFileChooser1.getSelectedFile();
-            String path = selectedImage.getAbsolutePath();
+            this.selectedImage = jFileChooser1.getSelectedFile();
+            this.path = this.selectedImage.getAbsolutePath();
             setIconImage(path);
         }
     }//GEN-LAST:event_btnFotoActionPerformed
@@ -484,9 +546,38 @@ public class VentanaRegistro extends javax.swing.JFrame {
         if (checkDatos()) {
             if (checkPass()) {
                 if (checkPrefs()) {
-                    
-                    JOptionPane.showMessageDialog(null,"OK");
-                    
+                    try {
+                        
+                        //envio la orden de registro al servidor
+                        int orden = 0;
+                        SealedObject so =Seguridad.cifrar(this.clavePubAjena, orden);
+                        Comunicacion.enviarObjeto(servidor, so);
+                        System.out.println("ORDEN REGISTRO OK");
+                        crearImagen();
+                        
+                        //creo el usuario y lo envio
+                        Usuario u = crearUsuario();
+                        so = Seguridad.cifrar(this.clavePubAjena, u);
+                        Comunicacion.enviarObjeto(servidor,so);
+                        System.out.println("ENVIADO USUARIO OK");
+                        
+                        //recibo el codigo de respuesta del servidor
+                        so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+                        int res = (int) Seguridad.descifrar(clavePrivPropia, so);
+                        
+                        //Exito
+                        if (res == 0) {
+                            JOptionPane.showMessageDialog(null,"Usuario registrado con exito");
+                            this.dispose();
+                        
+                        //Email repetido
+                        }else {
+                            JOptionPane.showMessageDialog(null,"El email introducido ya existe"); 
+                        }
+                        
+                    } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException | BadPaddingException ex) {
+                        Logger.getLogger(VentanaRegistro.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }else{
                     JOptionPane.showMessageDialog(null,"Debes marcar todas las preferencias");
                 }
@@ -496,7 +587,6 @@ public class VentanaRegistro extends javax.swing.JFrame {
         }else{
             JOptionPane.showMessageDialog(null,"Debes rellenar todos los datos de usuario");
         }
-        
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
 
@@ -539,6 +629,5 @@ public class VentanaRegistro extends javax.swing.JFrame {
     private javax.swing.JPasswordField txtPass1;
     private javax.swing.JPasswordField txtPass2;
     // End of variables declaration//GEN-END:variables
-
 
 }

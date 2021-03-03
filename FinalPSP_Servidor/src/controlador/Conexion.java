@@ -1,8 +1,10 @@
 
 package controlador;
 import Datos.Usuario;
+import Utilities.Seguridad;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JOptionPane;
 
 /**
@@ -24,10 +26,10 @@ public class Conexion {
     
     public void abrirConexion() {
         try {
-            
+            System.out.println("Estoy en abrir conexion");
             Class.forName("com.mysql.jdbc.Driver");
             //Realizamos la conexión a una BD con un usuario y una clave.
-            Conex = java.sql.DriverManager.getConnection("jdbc:mysql://localhost:3306/psp","root","");
+            Conex = java.sql.DriverManager.getConnection("jdbc:mysql://localhost/psp","root","");
             Sentencia_SQL = Conex.createStatement();
             System.out.println("Conexion realizada con éxito");
         } catch (Exception e) {
@@ -49,7 +51,7 @@ public class Conexion {
     public ArrayList<String> obtenerUsuarios() throws SQLException{
         
         ArrayList<String> lista = new ArrayList<>();
-        String sentencia = "SELECT nameuser FROM user";
+        String sentencia = "SELECT email FROM usuarios";
         Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
         
         while(Conj_Registros.next()){
@@ -58,10 +60,24 @@ public class Conexion {
         return lista;
     }
     
-    public void registrarUsuario(Usuario u) throws SQLException{
+    public void registrarUsuario(Usuario u){
         
-        String sentencia = "INSERT INTO user (nameuser, password, email)  values('"+u.getUsuario()+"','"+u.getPass()+"','"+u.getEmail()+"')";
+        try{
+            String sentencia = "INSERT INTO usuarios (id, email, pwd, nick, edad, foto) "
+                + "values('"+u.getId()+"','"+u.getEmail()+"','"+Seguridad.Hexadecimal(u.getPwd())+
+                 "','"+u.getNick()+"',"+u.getEdad()+" ,null)";
         Sentencia_SQL.executeUpdate(sentencia);
+        System.out.println("USUARIO REGISTRADO 1 OK");
+        
+        sentencia = "INSERT INTO preferencias (id, interes, relacion, t_hijos, q_hijos, deporte, arte, politica)"
+                + "values('"+u.getId()+"', "+u.getInteres()+", "+u.getRelacion()+", '"+u.getT_hijos()+"',"
+                + " '"+u.getQ_hijos()+"', "+u.getDeporte()+", "+u.getArte()+", "+u.getPolitica()+")";
+        Sentencia_SQL.executeUpdate(sentencia);
+        System.out.println("USUARIO REGISTRADO 2 OK");
+        }catch(Exception e){
+            System.out.println(e);
+        }
+        
         
     }
     

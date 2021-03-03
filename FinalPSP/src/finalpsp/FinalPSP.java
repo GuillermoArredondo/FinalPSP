@@ -5,6 +5,8 @@
  */
 package finalpsp;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import vista.VentanaLogin;
 
 /**
@@ -16,11 +18,11 @@ public class FinalPSP {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
+        
         VentanaLogin vl = new VentanaLogin();
         vl.setVisible(true);
         vl.setLocationRelativeTo(null);
-        
         
     }
     

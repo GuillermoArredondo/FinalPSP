@@ -5,16 +5,46 @@
  */
 package vista;
 
+import Utilities.Comunicacion;
+import Utilities.Seguridad;
+import finalpsp.Constantes;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Guille
  */
 public class VentanaLogin extends javax.swing.JFrame {
 
-    /**
-     * Creates new form ventanaLogin
-     */
-    public VentanaLogin() {
+    private Socket servidor;
+    private InetAddress dir;
+    private PrivateKey clavePrivPropia;
+    private PublicKey clavePubAjena;
+
+    public VentanaLogin() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
+        this.dir = InetAddress.getLocalHost();
+        this.servidor = new Socket(dir, Constantes.PUERTO);
+        
+        //genero mis claves
+        KeyPair par = Seguridad.generarClaves();
+        PublicKey clavePubPropia = par.getPublic();
+        this.clavePrivPropia = par.getPrivate();
+        
+        //envio mi clave publica
+        Comunicacion.enviarObjeto(servidor, clavePubPropia);
+        
+        //recibo la clave pub del servidor
+        this.clavePubAjena = (PublicKey) Comunicacion.recibirObjeto(servidor);
+        System.out.println("VENTANA LOGIN OK");
+        
         initComponents();
     }
 
@@ -43,6 +73,11 @@ public class VentanaLogin extends javax.swing.JFrame {
 
         btnLogin.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btnLogin.setText("Iniciar sesión");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoginActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("Contraseña:");
@@ -122,10 +157,24 @@ public class VentanaLogin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroActionPerformed
-        VentanaRegistro vr = new VentanaRegistro();
-        vr.setVisible(true);
-        vr.setLocationRelativeTo(null);
+        VentanaRegistro vr;
+        try {
+            
+            vr = new VentanaRegistro(this.clavePrivPropia,
+                    this.clavePubAjena, this.servidor);
+            vr.setVisible(true);
+            vr.setLocationRelativeTo(null);
+            
+        } catch (IOException ex) {
+        }
+        
     }//GEN-LAST:event_btnRegistroActionPerformed
+
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        
+        
+        
+    }//GEN-LAST:event_btnLoginActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
