@@ -5,18 +5,25 @@
  */
 package vista;
 
+import Datos.Usuario;
 import Utilities.Comunicacion;
 import Utilities.Seguridad;
 import finalpsp.Constantes;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -32,20 +39,35 @@ public class VentanaLogin extends javax.swing.JFrame {
     public VentanaLogin() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         this.dir = InetAddress.getLocalHost();
         this.servidor = new Socket(dir, Constantes.PUERTO);
-        
+
         //genero mis claves
         KeyPair par = Seguridad.generarClaves();
         PublicKey clavePubPropia = par.getPublic();
         this.clavePrivPropia = par.getPrivate();
-        
+
         //envio mi clave publica
         Comunicacion.enviarObjeto(servidor, clavePubPropia);
-        
+
         //recibo la clave pub del servidor
         this.clavePubAjena = (PublicKey) Comunicacion.recibirObjeto(servidor);
         System.out.println("VENTANA LOGIN OK");
-        
+
         initComponents();
+    }
+
+    private boolean vacios() {
+        boolean vacios = false;
+        if (txtUser.getText().isEmpty() || txtPass.getPassword().length == 0) {
+            vacios = true;
+        }
+        return vacios;
+    }
+
+    private byte[] resumirPwd() throws NoSuchAlgorithmException {
+        char[] pass = txtPass.getPassword();
+        String passStr = new String(pass);
+
+        return Seguridad.resumirPwd(passStr);
     }
 
     /**
@@ -159,21 +181,56 @@ public class VentanaLogin extends javax.swing.JFrame {
     private void btnRegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroActionPerformed
         VentanaRegistro vr;
         try {
-            
+
             vr = new VentanaRegistro(this.clavePrivPropia,
                     this.clavePubAjena, this.servidor);
             vr.setVisible(true);
             vr.setLocationRelativeTo(null);
-            
+
         } catch (IOException ex) {
         }
-        
+
     }//GEN-LAST:event_btnRegistroActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        
-        
-        
+        try {
+            if (!vacios()) {
+                //envio la orden de login al servidor
+                int orden = 1;
+                SealedObject so =Seguridad.cifrar(this.clavePubAjena, orden);
+                Comunicacion.enviarObjeto(servidor, so);
+                
+                //envio el usuario
+                byte[] pass = resumirPwd();
+                Usuario u = new Usuario(txtUser.getText(), pass);
+                
+                so = Seguridad.cifrar(clavePubAjena, u);
+                Comunicacion.enviarObjeto(servidor, so);
+                
+                //recibo el codigo de respuesta del servidor
+                so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+                int res = (int) Seguridad.descifrar(clavePrivPropia, so);
+                
+                switch (res) {
+                    case 0:
+                        JOptionPane.showMessageDialog(null, "¡Bienvenido!");
+                        break;
+                    case 1:
+                        JOptionPane.showMessageDialog(null, "Contraseña incorrecta");
+                        break;
+                    case 2:
+                        JOptionPane.showMessageDialog(null, "Ese email no existe");
+                        break;
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Rellena ambos campos");
+            }
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException | BadPaddingException ex) {
+            Logger.getLogger(VentanaLogin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
     }//GEN-LAST:event_btnLoginActionPerformed
 
 

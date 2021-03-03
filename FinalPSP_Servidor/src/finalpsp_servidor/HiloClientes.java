@@ -73,19 +73,37 @@ public class HiloClientes extends Thread {
                     int res = 0;
                     if (usuarioOk(u)) {
                         registrarUsuario(u);
-                        so = Seguridad.cifrar(clavePubAjena, res);
-                        Comunicacion.enviarObjeto(cliente, so);
+                        enviarRespuesta(res);
                     } else {
                         res = 1;
-                        so = Seguridad.cifrar(clavePubAjena, res);
-                        Comunicacion.enviarObjeto(cliente, so);
+                        enviarRespuesta(res);
                     }
                 
                 //loguear usuario -> 1
                 }else if (orden == 1) {
                     
                     System.out.println("ORDEN LOGIN");
+                    //recibe el usuario a loguear
+                    so = (SealedObject) Comunicacion.recibirObjeto(cliente);
+                    Usuario u = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
                     
+                    //La respuesta: sera 0 si el email y pass coinciden
+                    //              sera 1 si la pass no coincide
+                    //              sera 2 si no existe el email
+                    int res = 0;
+                    if (!usuarioOk(u)) {
+                        if (usuarioPass(u)) {
+                            enviarRespuesta(res);
+                            
+                        }else{
+                            res = 1;
+                            enviarRespuesta(res);
+                        }
+                        
+                    }else{
+                        res = 2;
+                        enviarRespuesta(res);
+                    }
                     
                 }
 
@@ -96,6 +114,19 @@ public class HiloClientes extends Thread {
         }
 
     }
+    
+    private void enviarRespuesta(int res){
+        SealedObject so;
+        try {
+            
+            so = Seguridad.cifrar(clavePubAjena, res);
+            Comunicacion.enviarObjeto(cliente, so);
+            
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException ex) {
+        }
+        
+    }
+    
 
     private void registrarUsuario(Usuario u) throws SQLException {
         this.con.abrirConexion();
@@ -113,6 +144,17 @@ public class HiloClientes extends Thread {
             }
         }
         this.con.cerrarConexion();
+        return ok;
+    }
+
+    private boolean usuarioPass(Usuario u) throws SQLException {
+        boolean ok = false;
+        String pass = Seguridad.Hexadecimal(u.getPwd());
+        this.con.abrirConexion();
+        String pass2 = this.con.obtenerPass(u.getEmail());
+        if (pass.equals(pass2)) {
+            ok = true;
+        }
         return ok;
     }
 

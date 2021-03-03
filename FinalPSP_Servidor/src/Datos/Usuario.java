@@ -45,6 +45,11 @@ public class Usuario implements Serializable{
 
     public Usuario() {
     }
+
+    public Usuario(String email, byte[] pwd) {
+        this.email = email;
+        this.pwd = pwd;
+    }
     
     public static String generateId() {
         String uuid = UUID.randomUUID().toString();

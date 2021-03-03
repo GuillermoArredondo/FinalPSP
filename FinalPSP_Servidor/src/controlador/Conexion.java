@@ -81,10 +81,10 @@ public class Conexion {
         
     }
     
-    public String obtenerPass(String name) throws SQLException{
+    public String obtenerPass(String email) throws SQLException{
         
         String res = "";
-        String sentencia = "SELECT password FROM user where nameuser='"+name+"'";
+        String sentencia = "SELECT pwd FROM usuarios where email='"+email+"'";
         Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
         
         while(Conj_Registros.next()){
@@ -93,5 +93,4 @@ public class Conexion {
         
         return res;
     }
-    
 }
