@@ -17,8 +17,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -87,21 +85,55 @@ public class HiloClientes extends Thread {
                     so = (SealedObject) Comunicacion.recibirObjeto(cliente);
                     Usuario u = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
                     
-                    //La respuesta: sera 0 si el email y pass coinciden
-                    //              sera 1 si la pass no coincide
-                    //              sera 2 si no existe el email
+                    //La respuesta: sera 0 si el email y pass coinciden (Admin)
+                    //              sera 1 si el email y pass coinciden (Usuario Activo)
+                    //              sera 2 si el email y pass coinciden (Usuario No Activo)
+                    //              sera 3 si la pass no coincide
+                    //              sera 4 si no existe el email
                     int res = 0;
                     if (!usuarioOk(u)) {
                         if (usuarioPass(u)) {
-                            enviarRespuesta(res);
+                            
+                            //obtengo el id del usuario
+                            String idUser = obtenerIdUser(u);
+                            
+                            //compruebo si ese usuario es admin
+                            if (checkAdmin(idUser)) {
+                                
+                                //envio la orden
+                                enviarRespuesta(res);
+                                
+                                //obtengo el usu admin y lo envio
+                                Usuario usu = obtenerUsuarioAdmin(idUser);
+                                so = Seguridad.cifrar(clavePubAjena, usu);
+                                Comunicacion.enviarObjeto(cliente, so);
+                                
+                            }else{
+                                //si no es admin, compruebo que este activo
+                                Usuario usu = obtenerUsuario(idUser);
+                                
+                                if (usu.getActivo() == 0) {
+                                    //si no esta activo envio la respuesta
+                                    res = 2;
+                                    enviarRespuesta(res);
+                                    
+                                }else{
+                                    //si esta activo, envio la respuesta y el usuario
+                                    res = 1;
+                                    enviarRespuesta(res);
+                                    
+                                    so = Seguridad.cifrar(clavePubAjena, usu);
+                                    Comunicacion.enviarObjeto(cliente, so);
+                                }
+                            }
                             
                         }else{
-                            res = 1;
+                            res = 3;
                             enviarRespuesta(res);
                         }
                         
                     }else{
-                        res = 2;
+                        res = 4;
                         enviarRespuesta(res);
                     }
                     
@@ -149,13 +181,51 @@ public class HiloClientes extends Thread {
 
     private boolean usuarioPass(Usuario u) throws SQLException {
         boolean ok = false;
-        String pass = Seguridad.Hexadecimal(u.getPwd());
+        String pass = u.getPwd();
         this.con.abrirConexion();
         String pass2 = this.con.obtenerPass(u.getEmail());
         if (pass.equals(pass2)) {
             ok = true;
         }
+        this.con.cerrarConexion();
         return ok;
+    }
+
+    private Usuario obtenerUsuarioAdmin(String idUser) throws SQLException {
+        this.con.abrirConexion();
+        Usuario u = this.con.obtenerUsuAdmin(idUser);
+        this.con.cerrarConexion();
+        return u;
+    }
+
+    private boolean checkAdmin(String idUser) throws SQLException {
+        boolean isAdmin = false;
+        this.con.abrirConexion();
+        ArrayList<String> listaIdsAdmins = this.con.obtenerUsuariosAdmins();
+        
+        for (int i = 0; i < listaIdsAdmins.size(); i++) {
+            if (idUser.equals(listaIdsAdmins.get(i))) {
+               isAdmin = true; 
+            }
+        }
+      
+        this.con.cerrarConexion();
+        return isAdmin;  
+    }
+
+    private String obtenerIdUser(Usuario u) throws SQLException {
+        String idUser = "";
+        this.con.abrirConexion();
+        idUser = this.con.obtenerIdUser(u.getEmail());
+        this.con.cerrarConexion();
+        return idUser;
+    }
+
+    private Usuario obtenerUsuario(String idUser) throws SQLException {
+        this.con.abrirConexion();
+        Usuario u = this.con.obtenerUsuario(idUser);
+        this.con.cerrarConexion();
+        return u;
     }
 
 }

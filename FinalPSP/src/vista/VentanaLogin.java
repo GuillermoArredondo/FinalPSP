@@ -202,7 +202,8 @@ public class VentanaLogin extends javax.swing.JFrame {
                 
                 //envio el usuario
                 byte[] pass = resumirPwd();
-                Usuario u = new Usuario(txtUser.getText(), pass);
+                String pass2 = Seguridad.Hexadecimal(pass);
+                Usuario u = new Usuario(txtUser.getText(), pass2);
                 
                 so = Seguridad.cifrar(clavePubAjena, u);
                 Comunicacion.enviarObjeto(servidor, so);
@@ -213,13 +214,23 @@ public class VentanaLogin extends javax.swing.JFrame {
                 
                 switch (res) {
                     case 0:
-                        JOptionPane.showMessageDialog(null, "¡Bienvenido!");
+                        so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+                        Usuario admin = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
+                        JOptionPane.showMessageDialog(null, "ADMIN: " + admin.getNick());
                         break;
                     case 1:
-                        JOptionPane.showMessageDialog(null, "Contraseña incorrecta");
+                        so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+                        Usuario usu = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
+                        JOptionPane.showMessageDialog(null, "USUARIO ACTIVO: " + usu.getNick());
                         break;
                     case 2:
-                        JOptionPane.showMessageDialog(null, "Ese email no existe");
+                        JOptionPane.showMessageDialog(null, "USUARIO NO ACTIVO");
+                        break;
+                    case 3:
+                        JOptionPane.showMessageDialog(null, "LA PASS NO COINCIDE");
+                        break;
+                    case 4:
+                        JOptionPane.showMessageDialog(null, "NO EXISTE EL EMAIL");
                         break;
                 }
 

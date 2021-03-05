@@ -12,7 +12,7 @@ public class Usuario implements Serializable{
     
     private String id;
     private String email;
-    private byte[] pwd;
+    private String pwd;
     private String nick;
     private int edad;
     private byte[] foto;
@@ -23,10 +23,11 @@ public class Usuario implements Serializable{
     private int deporte;
     private int arte;
     private int politica;
+    private int activo;
     
-    public Usuario(String email, byte[] pwd, String nick, int edad, byte[] foto,
+    public Usuario(String email, String pwd, String nick, int edad, byte[] foto,
                    int interes, int relacion, char t_hijos,
-                   char q_hijos, int deporte, int arte, int politica){
+                   char q_hijos, int deporte, int arte, int politica, int activo){
         
         this.id = generateId();
         this.email = email;
@@ -45,8 +46,16 @@ public class Usuario implements Serializable{
 
     public Usuario() {
     }
-
-    public Usuario(String email, byte[] pwd) {
+    
+    public Usuario(String id, String email, String pwd, String nick, byte[] foto) {
+        this.id = id;
+        this.email = email;
+        this.pwd = pwd;
+        this.nick = nick;
+        this.foto = foto;
+    }
+    
+    public Usuario(String email, String pwd) {
         this.email = email;
         this.pwd = pwd;
     }
@@ -55,6 +64,16 @@ public class Usuario implements Serializable{
         String uuid = UUID.randomUUID().toString();
         return uuid;
     }
+
+    public int getActivo() {
+        return activo;
+    }
+
+    public void setActivo(int activo) {
+        this.activo = activo;
+    }
+    
+    
 
     public String getId() {
         return id;
@@ -73,11 +92,11 @@ public class Usuario implements Serializable{
         this.email = email;
     }
 
-    public byte[] getPwd() {
+    public String getPwd() {
         return pwd;
     }
 
-    public void setPwd(byte[] pwd) {
+    public void setPwd(String pwd) {
         this.pwd = pwd;
     }
 

@@ -134,13 +134,14 @@ public class VentanaRegistro extends javax.swing.JFrame {
         }
         
         byte[] pass = resumirPwd();
+        String pass2 = Seguridad.Hexadecimal(pass);
         
-        return new Usuario(txtEmail.getText(), pass,
+        return new Usuario(txtEmail.getText(), pass2,
                 txtNick.getText(), (int) spEdad.getValue(), null, 
                 cbGeneros.getSelectedIndex(),
                 cbRelacion.getSelectedIndex(),
                 th, qh, sldDeporte.getValue(),
-                sldArte.getValue(), sldPolitica.getValue());
+                sldArte.getValue(), sldPolitica.getValue(), 0);
     }
 
     private void crearImagen() throws IOException {

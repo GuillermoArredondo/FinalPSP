@@ -64,4 +64,14 @@ public class Seguridad {
         System.out.println(pwdRes);
         return pwdRes;
     }
+    
+    public static String Hexadecimal(byte []resumen){
+        String hex="";
+        for (int i=0;i<resumen.length;i++){
+            String h = Integer.toHexString(resumen[i] & 0xFF);
+            if (h.length() == 1) hex+=0;
+            hex+=h;
+        }
+        return hex;
+    }
 }
