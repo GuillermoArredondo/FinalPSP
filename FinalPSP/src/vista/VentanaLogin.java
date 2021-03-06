@@ -217,6 +217,8 @@ public class VentanaLogin extends javax.swing.JFrame {
                         so = (SealedObject) Comunicacion.recibirObjeto(servidor);
                         Usuario admin = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
                         JOptionPane.showMessageDialog(null, "ADMIN: " + admin.getNick());
+                        VentanaAdmin va = new VentanaAdmin(admin, servidor, clavePrivPropia, clavePubAjena);
+                        va.setVisible(true);
                         break;
                     case 1:
                         so = (SealedObject) Comunicacion.recibirObjeto(servidor);

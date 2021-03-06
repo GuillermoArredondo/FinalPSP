@@ -2,6 +2,8 @@
 package controlador;
 import Datos.Usuario;
 import Utilities.Seguridad;
+import com.sun.javafx.scene.control.skin.FXVK;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,12 +28,12 @@ public class Conexion {
     
     public void abrirConexion() {
         try {
-            System.out.println("Estoy en abrir conexion");
+            //System.out.println("Estoy en abrir conexion");
             Class.forName("com.mysql.jdbc.Driver");
             //Realizamos la conexión a una BD con un usuario y una clave.
             Conex = java.sql.DriverManager.getConnection("jdbc:mysql://localhost/psp","root","");
             Sentencia_SQL = Conex.createStatement();
-            System.out.println("Conexion realizada con éxito");
+            //System.out.println("Conexion realizada con éxito");
         } catch (Exception e) {
             System.err.println("Exception: " + e.getMessage());
         }
@@ -163,5 +165,57 @@ public class Conexion {
                     null);
         }
         return usuA;
+    }
+
+    public ArrayList<Usuario> obtenerAdmins() throws SQLException {
+        ArrayList<String> listaIdsAdmin = new ArrayList<>();
+        String sentencia = "SELECT id FROM roles_usuarios where rol=0";
+        Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+        while(Conj_Registros.next()){
+            listaIdsAdmin.add(Conj_Registros.getString(1));
+        }
+        System.out.println("Lista de IDs admins: "+ listaIdsAdmin.size());
+        ArrayList<Usuario> listaAdmins = new ArrayList<>();
+        for (int i = 0; i < listaIdsAdmin.size(); i++) {
+            sentencia = "SELECT id, email, nick FROM usuarios where id='"+listaIdsAdmin.get(i)+"'";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while(Conj_Registros.next()){
+                String id = Conj_Registros.getString(1);
+                String email = Conj_Registros.getString(2);
+                String nick = Conj_Registros.getString(3);
+                Usuario u = new Usuario(id, email, nick);
+                listaAdmins.add(u);
+            }
+        }
+        System.out.println("Lista de admins: "+ listaAdmins.size());
+        return listaAdmins;
+    }
+
+    public ArrayList<Usuario> ObtenerUsus() throws SQLException {
+        ArrayList<String> listaIdsUsuarios = new ArrayList<>();
+        String sentencia = "SELECT id FROM roles_usuarios where rol=1";
+        Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+        while(Conj_Registros.next()){
+            listaIdsUsuarios.add(Conj_Registros.getString(1));
+        }
+        System.out.println("Lista de IDs usuarios: "+ listaIdsUsuarios.size());
+        ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+        for (int i = 0; i < listaIdsUsuarios.size(); i++) {
+            sentencia = "SELECT id, email, nick, edad, activo FROM usuarios where id='"+listaIdsUsuarios.get(i)+"'";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while(Conj_Registros.next()){
+                String id = Conj_Registros.getString(1);
+                String email = Conj_Registros.getString(2);
+                String nick = Conj_Registros.getString(3);
+                int edad = Conj_Registros.getInt(4);
+                int activo = Conj_Registros.getInt(5);
+                
+                Usuario u = new Usuario(id, email, nick, edad, activo);
+                listaUsuarios.add(u);
+            }
+        }
+        System.out.println("Lista de usuarios: "+ listaUsuarios.size());
+        return listaUsuarios;
+        
     }
 }

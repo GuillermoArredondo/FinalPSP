@@ -52,7 +52,7 @@ public class HiloClientes extends Thread {
             Comunicacion.enviarObjeto(cliente, clavePubPropia);
 
             System.out.println("ok");
-
+            boolean activo = true;
             do {
 
                 //recibe orden
@@ -107,6 +107,10 @@ public class HiloClientes extends Thread {
                                 Usuario usu = obtenerUsuarioAdmin(idUser);
                                 so = Seguridad.cifrar(clavePubAjena, usu);
                                 Comunicacion.enviarObjeto(cliente, so);
+                                HiloClienteAdmin hca = new HiloClienteAdmin(cliente, clavePrivPropia, clavePubAjena, con);
+                                hca.start();
+                                activo = false;
+                                
                                 
                             }else{
                                 //si no es admin, compruebo que este activo
@@ -139,7 +143,7 @@ public class HiloClientes extends Thread {
                     
                 }
 
-            } while (true);
+            } while (activo);
 
         } catch (IOException ex) {
         } catch (ClassNotFoundException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | SQLException ex) {
