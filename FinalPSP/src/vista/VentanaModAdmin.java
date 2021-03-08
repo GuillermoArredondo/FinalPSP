@@ -36,15 +36,23 @@ public class VentanaModAdmin extends javax.swing.JFrame {
     private PrivateKey clavePrivPropia;
     private PublicKey clavePubAjena;
     private JTable tableUsers;
+    private JTable tableAdmins;
     private ArrayList<Usuario> listaUsuarios;
+    private ArrayList<Usuario> listaAdmins;
+    private int modo;
 
-    public VentanaModAdmin(Socket servidor, PrivateKey clavePrivPropia, PublicKey clavePubAjena, JTable tableUsers) {
+    public VentanaModAdmin(int modo, Socket servidor, PrivateKey clavePrivPropia, PublicKey clavePubAjena, JTable tableUsers, JTable tableAdmins) {
+        this.modo = modo;
         this.servidor = servidor;
         this.clavePrivPropia = clavePrivPropia;
         this.clavePubAjena = clavePubAjena;
         this.tableUsers = tableUsers;
+        this.tableAdmins = tableAdmins;
         initComponents();
         setValuesToSpinner();
+
+        setModo();
+
     }
 
     /**
@@ -60,8 +68,8 @@ public class VentanaModAdmin extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        lblEdad = new javax.swing.JLabel();
+        lblActivo = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
         txtNick = new javax.swing.JTextField();
         ckActivo = new javax.swing.JCheckBox();
@@ -79,11 +87,11 @@ public class VentanaModAdmin extends javax.swing.JFrame {
 
         jLabel3.setText("Nick:");
 
-        jLabel4.setText("Edad:");
+        lblEdad.setText("Edad:");
 
-        jLabel5.setText("Activo");
+        lblActivo.setText("Activo");
 
-        btnAceptar.setText("Aceptar");
+        btnAceptar.setText("Crear");
         btnAceptar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAceptarActionPerformed(evt);
@@ -107,8 +115,8 @@ public class VentanaModAdmin extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(53, 53, 53)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel4)
+                    .addComponent(lblActivo)
+                    .addComponent(lblEdad)
                     .addComponent(jLabel3)
                     .addComponent(jLabel2)
                     .addComponent(jLabel1))
@@ -151,11 +159,11 @@ public class VentanaModAdmin extends javax.swing.JFrame {
                     .addComponent(txtNick, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
+                    .addComponent(lblEdad)
                     .addComponent(spEdad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
+                    .addComponent(lblActivo)
                     .addComponent(ckActivo))
                 .addGap(52, 52, 52)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -181,38 +189,77 @@ public class VentanaModAdmin extends javax.swing.JFrame {
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
 
         if (checkVacios()) {
+            if (modo == 0) {
 
-            try {
+                try {
 
-                //envio la orden de registro al servidor    
-                int orden = 3;
-                SealedObject so;
-                so = Seguridad.cifrar(this.clavePubAjena, orden);
-                Comunicacion.enviarObjeto(servidor, so);
+                    //envio la orden de registro al servidor    
+                    int orden = 3;
+                    SealedObject so;
+                    so = Seguridad.cifrar(this.clavePubAjena, orden);
+                    Comunicacion.enviarObjeto(servidor, so);
 
-                //creo el usuario y lo envio
-                Usuario u = crearUsuario();
-                so = Seguridad.cifrar(this.clavePubAjena, u);
-                Comunicacion.enviarObjeto(servidor, so);
+                    //creo el usuario y lo envio
+                    Usuario u = crearUsuario();
+                    so = Seguridad.cifrar(this.clavePubAjena, u);
+                    Comunicacion.enviarObjeto(servidor, so);
 
-                //recibo el codigo de respuesta del servidor
-                so = (SealedObject) Comunicacion.recibirObjeto(servidor);
-                int res = (int) Seguridad.descifrar(clavePrivPropia, so);
+                    //recibo el codigo de respuesta del servidor
+                    so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+                    int res = (int) Seguridad.descifrar(clavePrivPropia, so);
 
-                //Exito
-                if (res == 0) {
+                    //Exito
+                    if (res == 0) {
 
-                    JOptionPane.showMessageDialog(null, "Usuario registrado con exito");
-                    rellenarTablaUsuarios();
-                    this.dispose();
+                        JOptionPane.showMessageDialog(null, "Usuario registrado con exito");
+                        rellenarTablaUsuarios();
+                        this.dispose();
 
-                    //Email repetido
-                } else {
-                    JOptionPane.showMessageDialog(null, "El email introducido ya existe");
+                        //Email repetido
+                    } else {
+                        JOptionPane.showMessageDialog(null, "El email introducido ya existe");
+                    }
+
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException | BadPaddingException ex) {
+                    Logger.getLogger(VentanaModAdmin.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException | BadPaddingException ex) {
-                Logger.getLogger(VentanaModAdmin.class.getName()).log(Level.SEVERE, null, ex);
+            }else{
+                
+                try {
+
+                    //envio la orden de registro al servidor    
+                    int orden = 6;
+                    SealedObject so;
+                    so = Seguridad.cifrar(this.clavePubAjena, orden);
+                    Comunicacion.enviarObjeto(servidor, so);
+
+                    //creo el usuario y lo envio
+                    Usuario u = crearUsuarioAdmin();
+                    so = Seguridad.cifrar(this.clavePubAjena, u);
+                    Comunicacion.enviarObjeto(servidor, so);
+
+                    //recibo el codigo de respuesta del servidor
+                    so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+                    int res = (int) Seguridad.descifrar(clavePrivPropia, so);
+
+                    //Exito
+                    if (res == 0) {
+
+                        JOptionPane.showMessageDialog(null, "Admin registrado con exito");
+                        rellenarTablaAdmins();
+                        rellenarTablaUsuarios();
+                        this.dispose();
+
+                    //Email repetido
+                    } else {
+                        JOptionPane.showMessageDialog(null, "El email introducido ya existe");
+                    }
+
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException | BadPaddingException ex) {
+                    Logger.getLogger(VentanaModAdmin.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
             }
 
         }
@@ -231,9 +278,9 @@ public class VentanaModAdmin extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lblActivo;
+    private javax.swing.JLabel lblEdad;
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JSpinner spEdad;
     private javax.swing.JTextField txtEmail;
@@ -324,6 +371,58 @@ public class VentanaModAdmin extends javax.swing.JFrame {
         tableUsers.setModel(modelo);
         tableUsers.setDefaultEditor(Object.class, null);
 
+    }
+    
+    private void rellenarTablaAdmins() throws IOException, ClassNotFoundException {
+        try {
+
+            SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+            this.listaAdmins = (ArrayList<Usuario>) Seguridad.descifrar(clavePrivPropia, so);
+            VentanaAdmin.listaAdmins = this.listaAdmins;
+
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | ClassNotFoundException | IllegalBlockSizeException | BadPaddingException ex) {
+            Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        DefaultTableModel modelo = new DefaultTableModel();
+
+        modelo.addColumn("ID");
+        modelo.addColumn("Email");
+        modelo.addColumn("Nick");
+
+        Object[] o = new Object[3];
+        for (int i = 0; i < listaAdmins.size(); i++) {
+            o[0] = listaAdmins.get(i).getId();
+            o[1] = listaAdmins.get(i).getEmail();
+            o[2] = listaAdmins.get(i).getNick();
+            modelo.addRow(o);
+        }
+        tableAdmins.setModel(modelo);
+        tableAdmins.setDefaultEditor(Object.class, null);
+
+    }
+
+    private void setModo() {
+        if (modo == 1) {
+            lblTitulo.setText("Crear admin");
+            lblActivo.setEnabled(false);
+            ckActivo.setEnabled(false);
+        }
+    }
+
+    private Usuario crearUsuarioAdmin() throws NoSuchAlgorithmException {
+        byte[] pass = resumirPwd();
+        String pass2 = Seguridad.Hexadecimal(pass);
+
+        Usuario u = new Usuario();
+        u.setId(u.generateId());
+        u.setEmail(txtEmail.getText());
+        u.setPwd(pass2);
+        u.setNick(txtNick.getText());
+        u.setEdad((int) spEdad.getValue());
+        u.setActivo(1);
+
+        return u;
     }
 
 }

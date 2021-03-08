@@ -261,4 +261,26 @@ public class Conexion {
             System.out.println(e);
         }
     }
+
+    public void quitarAdmin(String idUser) throws SQLException {
+        String sentencia = "delete from roles_usuarios where id = '" + idUser + "' and rol = 0";
+        Sentencia_SQL.executeUpdate(sentencia);
+    }
+
+    public void registrarAdmin(Usuario u) {
+        try {
+            String sentencia = "INSERT INTO usuarios (id, email, pwd, nick, edad, activo) "
+                    + "values('" + u.getId() + "','" + u.getEmail() + "','" + u.getPwd()
+                    + "','" + u.getNick() + "'," + u.getEdad() + " , "+u.getActivo()+")";
+            Sentencia_SQL.executeUpdate(sentencia);
+            System.out.println("ADMIN REGISTRADO 1 OK");
+
+            sentencia = "INSERT INTO roles_usuarios VALUES('" + u.getId() + "', 0)";
+            Sentencia_SQL.executeUpdate(sentencia);
+            System.out.println("ADMIN REGISTRADO 2 OK");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 }

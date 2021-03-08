@@ -10,7 +10,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -58,6 +57,10 @@ class HiloClienteAdmin extends Thread {
                 //       1 -> Convertir en admin
                 //       2 -> Eliminar un usuario
                 //       3 -> Crear usuario
+                //       4 -> Quitar priv de admin
+                //       5 -> Eliminar un admin
+                //       6 -> Crear admin
+                
                 switch (orden) {
                     case 0:
                         so = (SealedObject) Comunicacion.recibirObjeto(cliente);
@@ -77,7 +80,6 @@ class HiloClienteAdmin extends Thread {
                     case 2:
                         so = (SealedObject) Comunicacion.recibirObjeto(cliente);
                         idUser = (String) Seguridad.descifrar(clavePrivPropia, so);
-                        System.out.println("DELETE RECIBIDO" + idUser);
                         eliminarUser(idUser);
                         enviarListaUsuarios();
                         enviarListaAdmins();
@@ -96,7 +98,36 @@ class HiloClienteAdmin extends Thread {
                             res = 1;
                             enviarRespuesta(res);
                         }
-
+                        break;
+                        
+                    case 4:
+                        so = (SealedObject) Comunicacion.recibirObjeto(cliente);
+                        idUser = (String) Seguridad.descifrar(clavePrivPropia, so);
+                        quitarAdmin(idUser);
+                        enviarListaAdmins();
+                        break;
+                        
+                    case 5:
+                        so = (SealedObject) Comunicacion.recibirObjeto(cliente);
+                        idUser = (String) Seguridad.descifrar(clavePrivPropia, so);
+                        eliminarUser(idUser);
+                        enviarListaAdmins();
+                        break;
+                        
+                    case 6:
+                        so = (SealedObject) Comunicacion.recibirObjeto(cliente);
+                        u = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
+                        res = 0;
+                        if (usuarioOk(u)) {
+                            registrarAdmin(u);
+                            enviarRespuesta(res);
+                            enviarListaAdmins();
+                            enviarListaUsuarios();
+                            
+                        } else {
+                            res = 1;
+                            enviarRespuesta(res);
+                        }
                         break;
                 }
 
@@ -196,5 +227,18 @@ class HiloClienteAdmin extends Thread {
         this.con.cerrarConexion();
         return ok;
     }
+
+    private void quitarAdmin(String idUser) throws SQLException {
+        this.con.abrirConexion();
+        this.con.quitarAdmin(idUser);
+        this.con.cerrarConexion();
+    }
+
+    private void registrarAdmin(Usuario u) {
+        this.con.abrirConexion();
+        this.con.registrarAdmin(u);
+        this.con.cerrarConexion();
+    }
+
 
 }

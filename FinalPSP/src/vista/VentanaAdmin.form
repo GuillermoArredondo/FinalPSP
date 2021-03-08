@@ -66,19 +66,17 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane2" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="736" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="57" max="-2" attributes="0"/>
                           <Component id="btnAddAdmin" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="btnModAdmin" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                           <Component id="btnDeleteAdmin" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="btnUnableAdmin" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="31" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="53" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -88,7 +86,6 @@
                           <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="btnAddAdmin" alignment="3" min="-2" pref="37" max="-2" attributes="0"/>
-                              <Component id="btnModAdmin" alignment="3" min="-2" pref="37" max="-2" attributes="0"/>
                               <Component id="btnDeleteAdmin" alignment="3" min="-2" pref="37" max="-2" attributes="0"/>
                               <Component id="btnUnableAdmin" alignment="3" min="-2" pref="37" max="-2" attributes="0"/>
                           </Group>
@@ -124,21 +121,25 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="A&#xf1;adir nuevo administrador"/>
                   </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="btnModAdmin">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Modificar administrador"/>
-                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddAdminActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnDeleteAdmin">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Eliminar administrador"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDeleteAdminActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnUnableAdmin">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Quitar privilegio admin"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnUnableAdminActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

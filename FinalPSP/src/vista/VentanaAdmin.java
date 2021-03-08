@@ -34,7 +34,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
     private PrivateKey clavePrivPropia;
     private PublicKey clavePubAjena;
     private Usuario admin;
-    private ArrayList<Usuario> listaAdmins;
+    public static ArrayList<Usuario> listaAdmins;
     public static ArrayList<Usuario> listaUsuarios;
 
     public VentanaAdmin(Usuario admin, Socket servidor, PrivateKey clavePrivPropia, PublicKey clavePubAjena) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -66,7 +66,6 @@ public class VentanaAdmin extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tableAdmins = new javax.swing.JTable();
         btnAddAdmin = new javax.swing.JButton();
-        btnModAdmin = new javax.swing.JButton();
         btnDeleteAdmin = new javax.swing.JButton();
         btnUnableAdmin = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
@@ -108,12 +107,25 @@ public class VentanaAdmin extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tableAdmins);
 
         btnAddAdmin.setText("Añadir nuevo administrador");
-
-        btnModAdmin.setText("Modificar administrador");
+        btnAddAdmin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddAdminActionPerformed(evt);
+            }
+        });
 
         btnDeleteAdmin.setText("Eliminar administrador");
+        btnDeleteAdmin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteAdminActionPerformed(evt);
+            }
+        });
 
         btnUnableAdmin.setText("Quitar privilegio admin");
+        btnUnableAdmin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUnableAdminActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -121,18 +133,16 @@ public class VentanaAdmin extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 736, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
+                .addGap(57, 57, 57)
                 .addComponent(btnAddAdmin)
-                .addGap(18, 18, 18)
-                .addComponent(btnModAdmin)
-                .addGap(18, 18, 18)
+                .addGap(27, 27, 27)
                 .addComponent(btnDeleteAdmin)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnUnableAdmin)
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addGap(53, 53, 53))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -140,7 +150,6 @@ public class VentanaAdmin extends javax.swing.JFrame {
                 .addGap(25, 25, 25)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnModAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDeleteAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnUnableAdmin, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
@@ -275,7 +284,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
     private void btnEnableAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnableAdminActionPerformed
 
         if (tableUsers.getSelectedColumn() != -1) {
-            if (checkIsAdmin()) {
+            if (!checkIsAdmin()) {
                 try {
 
                     //envio la orden al servidor
@@ -307,14 +316,14 @@ public class VentanaAdmin extends javax.swing.JFrame {
     }//GEN-LAST:event_btnEnableAdminActionPerformed
 
     private void btnCreateUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateUserActionPerformed
-        
-        VentanaModAdmin vna = new VentanaModAdmin(servidor, clavePrivPropia, clavePubAjena, tableUsers);
+
+        VentanaModAdmin vna = new VentanaModAdmin(0, servidor, clavePrivPropia, clavePubAjena, tableUsers, tableAdmins);
         vna.setVisible(true);
         vna.setLocationRelativeTo(null);
     }//GEN-LAST:event_btnCreateUserActionPerformed
 
     private void btnDeleteUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteUserActionPerformed
-        
+
         if (tableUsers.getSelectedColumn() != -1) {
             try {
 
@@ -342,6 +351,74 @@ public class VentanaAdmin extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnDeleteUserActionPerformed
 
+    private void btnUnableAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUnableAdminActionPerformed
+
+        if (tableAdmins.getSelectedColumn() != -1) {
+
+            try {
+
+                //envio la orden al servidor
+                int orden = 4;
+                SealedObject so = Seguridad.cifrar(clavePubAjena, orden);
+                Comunicacion.enviarObjeto(servidor, so);
+
+                //selecciono el id del usuario al que se le va a quitar el privilegio
+                String idUser = listaAdmins.get(tableAdmins.getSelectedRow()).getId();
+                so = Seguridad.cifrar(clavePubAjena, idUser);
+                Comunicacion.enviarObjeto(servidor, so);
+
+                JOptionPane.showMessageDialog(null, "Privilegios eliminados correctamente");
+
+                rellenarTablaAdmins();
+
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException ex) {
+                Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Debes seleccionar un admin");
+        }
+
+    }//GEN-LAST:event_btnUnableAdminActionPerformed
+
+    private void btnDeleteAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteAdminActionPerformed
+        
+        if (tableAdmins.getSelectedColumn() != -1) {
+
+            try {
+
+                //envio la orden al servidor
+                int orden = 5;
+                SealedObject so = Seguridad.cifrar(clavePubAjena, orden);
+                Comunicacion.enviarObjeto(servidor, so);
+
+                //selecciono el id del admin que se va a eliminar
+                String idUser = listaAdmins.get(tableAdmins.getSelectedRow()).getId();
+                so = Seguridad.cifrar(clavePubAjena, idUser);
+                Comunicacion.enviarObjeto(servidor, so);
+
+                JOptionPane.showMessageDialog(null, "Administrador eliminado correctamente");
+
+                rellenarTablaAdmins();
+
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException ex) {
+                Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Debes seleccionar un admin");
+        }
+        
+    }//GEN-LAST:event_btnDeleteAdminActionPerformed
+
+    private void btnAddAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAdminActionPerformed
+        
+        VentanaModAdmin vna = new VentanaModAdmin(1, servidor, clavePrivPropia, clavePubAjena, tableUsers, tableAdmins);
+        vna.setVisible(true);
+        vna.setLocationRelativeTo(null);
+        
+    }//GEN-LAST:event_btnAddAdminActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActiveUser;
@@ -350,7 +427,6 @@ public class VentanaAdmin extends javax.swing.JFrame {
     private javax.swing.JButton btnDeleteAdmin;
     private javax.swing.JButton btnDeleteUser;
     private javax.swing.JButton btnEnableAdmin;
-    private javax.swing.JButton btnModAdmin;
     private javax.swing.JButton btnUnableAdmin;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -373,7 +449,7 @@ public class VentanaAdmin extends javax.swing.JFrame {
         }
 
         DefaultTableModel modelo = new DefaultTableModel();
-        
+
         modelo.addColumn("ID");
         modelo.addColumn("Email");
         modelo.addColumn("Nick");
@@ -387,7 +463,6 @@ public class VentanaAdmin extends javax.swing.JFrame {
         }
         tableAdmins.setModel(modelo);
         tableAdmins.setDefaultEditor(Object.class, null);
-        
 
     }
 
@@ -428,9 +503,15 @@ public class VentanaAdmin extends javax.swing.JFrame {
         tableUsers.setDefaultEditor(Object.class, null);
 
     }
-   
+
     private boolean checkIsAdmin() {
-        return true;
+        boolean isAdmin = false;
+        for (int i = 0; i < listaAdmins.size(); i++) {
+            if (listaAdmins.get(i).getId().equals(listaUsuarios.get(tableUsers.getSelectedRow()).getId())) {
+                isAdmin = true;
+            }
+        }
+        return isAdmin;
     }
-    
+
 }
