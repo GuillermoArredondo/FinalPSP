@@ -15,10 +15,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SealedObject;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -32,28 +35,20 @@ public class VentanaAdmin extends javax.swing.JFrame {
     private PublicKey clavePubAjena;
     private Usuario admin;
     private ArrayList<Usuario> listaAdmins;
-    private ArrayList<Usuario> listaUsuarios;
-    
+    public static ArrayList<Usuario> listaUsuarios;
+
     public VentanaAdmin(Usuario admin, Socket servidor, PrivateKey clavePrivPropia, PublicKey clavePubAjena) throws IOException, ClassNotFoundException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         this.admin = admin;
         this.servidor = servidor;
         this.clavePrivPropia = clavePrivPropia;
         this.clavePubAjena = clavePubAjena;
-        
-        //recibo las listas
-        SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
-        this.listaAdmins = (ArrayList<Usuario>) Seguridad.descifrar(clavePrivPropia, so);
-        
-        so = (SealedObject) Comunicacion.recibirObjeto(servidor);
-        this.listaUsuarios = (ArrayList<Usuario>) Seguridad.descifrar(clavePrivPropia, so);
-        
-        
-        System.out.println("ADMINS: "+listaAdmins.size());
-        System.out.println("USUARIOS: "+listaUsuarios.size());
-        
+
         initComponents();
+
         rellenarTablaAdmins();
         rellenarTablaUsuarios();
+        System.out.println("ADMINS: " + listaAdmins.size());
+        System.out.println("USUARIOS: " + listaUsuarios.size());
     }
 
     /**
@@ -165,8 +160,18 @@ public class VentanaAdmin extends javax.swing.JFrame {
         jScrollPane3.setViewportView(tableUsers);
 
         btnCreateUser.setText("Crear usuario");
+        btnCreateUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateUserActionPerformed(evt);
+            }
+        });
 
         btnDeleteUser.setText("Eliminar usuario");
+        btnDeleteUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteUserActionPerformed(evt);
+            }
+        });
 
         btnEnableAdmin.setText("Convertir en admin");
         btnEnableAdmin.addActionListener(new java.awt.event.ActionListener() {
@@ -236,12 +241,106 @@ public class VentanaAdmin extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnActiveUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActiveUserActionPerformed
-        // TODO add your handling code here:
+
+        if (tableUsers.getSelectedColumn() != -1) {
+            if (listaUsuarios.get(tableUsers.getSelectedRow()).getActivo() == 0) {
+                try {
+
+                    //envio la orden al servidor
+                    int orden = 0;
+                    SealedObject so = Seguridad.cifrar(clavePubAjena, orden);
+                    Comunicacion.enviarObjeto(servidor, so);
+
+                    //selecciono el id del usuario que se va a activar, y lo envio
+                    String idUser = listaUsuarios.get(tableUsers.getSelectedRow()).getId();
+                    so = Seguridad.cifrar(clavePubAjena, idUser);
+                    Comunicacion.enviarObjeto(servidor, so);
+
+                    JOptionPane.showMessageDialog(null, "Usuario activado con éxito");
+
+                    rellenarTablaUsuarios();
+
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException ex) {
+                    Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "El usuario seleccionado ya esta activado");
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Debes seleccionar un usuario");
+        }
     }//GEN-LAST:event_btnActiveUserActionPerformed
 
     private void btnEnableAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnableAdminActionPerformed
-        // TODO add your handling code here:
+
+        if (tableUsers.getSelectedColumn() != -1) {
+            if (checkIsAdmin()) {
+                try {
+
+                    //envio la orden al servidor
+                    int orden = 1;
+                    SealedObject so = Seguridad.cifrar(clavePubAjena, orden);
+                    Comunicacion.enviarObjeto(servidor, so);
+
+                    //selecciono el id del usuario que se va a convertir en admin
+                    String idUser = listaUsuarios.get(tableUsers.getSelectedRow()).getId();
+                    so = Seguridad.cifrar(clavePubAjena, idUser);
+                    Comunicacion.enviarObjeto(servidor, so);
+
+                    JOptionPane.showMessageDialog(null, "Usuario convertido en administrador correctamente");
+
+                    rellenarTablaUsuarios();
+                    rellenarTablaAdmins();
+
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException ex) {
+                    Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "El usuario seleccionado ya es administrador");
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Debes seleccionar un usuario");
+        }
+
     }//GEN-LAST:event_btnEnableAdminActionPerformed
+
+    private void btnCreateUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateUserActionPerformed
+        
+        VentanaModAdmin vna = new VentanaModAdmin(servidor, clavePrivPropia, clavePubAjena, tableUsers);
+        vna.setVisible(true);
+        vna.setLocationRelativeTo(null);
+    }//GEN-LAST:event_btnCreateUserActionPerformed
+
+    private void btnDeleteUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteUserActionPerformed
+        
+        if (tableUsers.getSelectedColumn() != -1) {
+            try {
+
+                //envio la orden al servidor
+                int orden = 2;
+                SealedObject so = Seguridad.cifrar(clavePubAjena, orden);
+                Comunicacion.enviarObjeto(servidor, so);
+
+                //selecciono el id del usuario que se va a eliminar
+                String idUser = listaUsuarios.get(tableUsers.getSelectedRow()).getId();
+                so = Seguridad.cifrar(clavePubAjena, idUser);
+                Comunicacion.enviarObjeto(servidor, so);
+                System.out.println("DELETE ENVIADO");
+
+                JOptionPane.showMessageDialog(null, "Usuario eliminado correctamente");
+
+                rellenarTablaUsuarios();
+                rellenarTablaAdmins();
+
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException | ClassNotFoundException ex) {
+                Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+    }//GEN-LAST:event_btnDeleteUserActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -263,27 +362,46 @@ public class VentanaAdmin extends javax.swing.JFrame {
     private javax.swing.JTable tableUsers;
     // End of variables declaration//GEN-END:variables
 
-    private void rellenarTablaAdmins() {
-        
-        DefaultTableModel modelo = new DefaultTableModel();
+    private void rellenarTablaAdmins() throws IOException, ClassNotFoundException {
+        try {
 
+            SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+            this.listaAdmins = (ArrayList<Usuario>) Seguridad.descifrar(clavePrivPropia, so);
+
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | ClassNotFoundException | IllegalBlockSizeException | BadPaddingException ex) {
+            Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        DefaultTableModel modelo = new DefaultTableModel();
+        
         modelo.addColumn("ID");
         modelo.addColumn("Email");
         modelo.addColumn("Nick");
-        
+
         Object[] o = new Object[3];
         for (int i = 0; i < listaAdmins.size(); i++) {
             o[0] = listaAdmins.get(i).getId();
             o[1] = listaAdmins.get(i).getEmail();
-            o[2] = listaAdmins.get(i).getNick(); 
-            modelo.addRow(o); 
+            o[2] = listaAdmins.get(i).getNick();
+            modelo.addRow(o);
         }
         tableAdmins.setModel(modelo);
+        tableAdmins.setDefaultEditor(Object.class, null);
         
+
     }
-    
-    private void rellenarTablaUsuarios() {
-        
+
+    private void rellenarTablaUsuarios() throws IOException, ClassNotFoundException {
+
+        try {
+
+            SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+            this.listaUsuarios = (ArrayList<Usuario>) Seguridad.descifrar(clavePrivPropia, so);
+
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
+            Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         DefaultTableModel modelo = new DefaultTableModel();
 
         modelo.addColumn("ID");
@@ -291,22 +409,28 @@ public class VentanaAdmin extends javax.swing.JFrame {
         modelo.addColumn("Nick");
         modelo.addColumn("Edad");
         modelo.addColumn("Activo");
-        
+
         Object[] o = new Object[5];
         for (int i = 0; i < listaUsuarios.size(); i++) {
             o[0] = listaUsuarios.get(i).getId();
             o[1] = listaUsuarios.get(i).getEmail();
-            o[2] = listaUsuarios.get(i).getNick(); 
+            o[2] = listaUsuarios.get(i).getNick();
             o[3] = listaUsuarios.get(i).getEdad();
-            if (listaUsuarios.get(i).getActivo()==0) {
+            if (listaUsuarios.get(i).getActivo() == 0) {
                 o[4] = false;
-            }else{
+            } else {
                 o[4] = true;
             }
-            
-            modelo.addRow(o); 
+
+            modelo.addRow(o);
         }
         tableUsers.setModel(modelo);
-        
+        tableUsers.setDefaultEditor(Object.class, null);
+
     }
+   
+    private boolean checkIsAdmin() {
+        return true;
+    }
+    
 }

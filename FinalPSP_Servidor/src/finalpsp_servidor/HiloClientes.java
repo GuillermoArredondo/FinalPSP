@@ -84,6 +84,7 @@ public class HiloClientes extends Thread {
                     //recibe el usuario a loguear
                     so = (SealedObject) Comunicacion.recibirObjeto(cliente);
                     Usuario u = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
+                    System.out.println("SERVIDOR Recibo Usuario");
                     
                     //La respuesta: sera 0 si el email y pass coinciden (Admin)
                     //              sera 1 si el email y pass coinciden (Usuario Activo)
@@ -93,7 +94,7 @@ public class HiloClientes extends Thread {
                     int res = 0;
                     if (!usuarioOk(u)) {
                         if (usuarioPass(u)) {
-                            
+                            System.out.println("SERVIDOR Recibo Usuario" + u.getNick());
                             //obtengo el id del usuario
                             String idUser = obtenerIdUser(u);
                             

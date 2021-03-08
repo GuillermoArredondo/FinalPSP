@@ -31,7 +31,7 @@ public class Seguridad {
         try {
             keyGen = KeyPairGenerator.getInstance("RSA");
             SecureRandom numero = SecureRandom.getInstance("SHA1PRNG");
-            keyGen.initialize(4096, numero);
+            keyGen.initialize(5120, numero);
             par = keyGen.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
         }

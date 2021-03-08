@@ -69,12 +69,11 @@ public class Usuario implements Serializable{
         this.activo = activo;
     }
     
-    
     public Usuario(String email, String pwd) {
         this.email = email;
         this.pwd = pwd;
     }
-    
+
     public static String generateId() {
         String uuid = UUID.randomUUID().toString();
         return uuid;

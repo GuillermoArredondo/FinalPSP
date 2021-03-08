@@ -199,7 +199,7 @@ public class VentanaLogin extends javax.swing.JFrame {
                 int orden = 1;
                 SealedObject so =Seguridad.cifrar(this.clavePubAjena, orden);
                 Comunicacion.enviarObjeto(servidor, so);
-                
+                System.out.println("CLIENTE Envio Orden");
                 //envio el usuario
                 byte[] pass = resumirPwd();
                 String pass2 = Seguridad.Hexadecimal(pass);
@@ -207,10 +207,11 @@ public class VentanaLogin extends javax.swing.JFrame {
                 
                 so = Seguridad.cifrar(clavePubAjena, u);
                 Comunicacion.enviarObjeto(servidor, so);
-                
+                System.out.println("CLIENTE Envio Usuario");
                 //recibo el codigo de respuesta del servidor
                 so = (SealedObject) Comunicacion.recibirObjeto(servidor);
                 int res = (int) Seguridad.descifrar(clavePrivPropia, so);
+                System.out.println("CLIENTE Recibo respuesta");
                 
                 switch (res) {
                     case 0:
@@ -219,6 +220,8 @@ public class VentanaLogin extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(null, "ADMIN: " + admin.getNick());
                         VentanaAdmin va = new VentanaAdmin(admin, servidor, clavePrivPropia, clavePubAjena);
                         va.setVisible(true);
+                        va.setLocationRelativeTo(null);
+                        this.dispose();
                         break;
                     case 1:
                         so = (SealedObject) Comunicacion.recibirObjeto(servidor);
