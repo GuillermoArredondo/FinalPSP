@@ -227,6 +227,10 @@ public class VentanaLogin extends javax.swing.JFrame {
                         so = (SealedObject) Comunicacion.recibirObjeto(servidor);
                         Usuario usu = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
                         JOptionPane.showMessageDialog(null, "USUARIO ACTIVO: " + usu.getNick());
+                        VentanaUsuario vu = new VentanaUsuario(usu, servidor, clavePrivPropia, clavePubAjena);
+                        vu.setVisible(true);
+                        vu.setLocationRelativeTo(null);
+                        this.dispose();
                         break;
                     case 2:
                         JOptionPane.showMessageDialog(null, "USUARIO NO ACTIVO");

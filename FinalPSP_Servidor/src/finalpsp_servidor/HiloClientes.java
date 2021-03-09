@@ -126,9 +126,11 @@ public class HiloClientes extends Thread {
                                     //si esta activo, envio la respuesta y el usuario
                                     res = 1;
                                     enviarRespuesta(res);
-                                    
                                     so = Seguridad.cifrar(clavePubAjena, usu);
                                     Comunicacion.enviarObjeto(cliente, so);
+                                    HiloClienteUsuario hcu = new HiloClienteUsuario(cliente, clavePrivPropia, clavePubAjena, con);
+                                    hcu.start();
+                                    activo = false;
                                 }
                             }
                             
