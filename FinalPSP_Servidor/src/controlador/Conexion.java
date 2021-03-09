@@ -80,13 +80,14 @@ public class Conexion {
         Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
 
         while (Conj_Registros.next()) {
-            u.setInteres(Conj_Registros.getInt(2));
-            u.setRelacion(Conj_Registros.getInt(3));
-            u.setT_hijos(Conj_Registros.getString(4).charAt(0));
-            u.setQ_hijos(Conj_Registros.getString(5).charAt(0));
-            u.setDeporte(Conj_Registros.getInt(6));
-            u.setArte(Conj_Registros.getInt(7));
-            u.setPolitica(Conj_Registros.getInt(8));
+            u.setGenero(Conj_Registros.getInt(2));
+            u.setInteres(Conj_Registros.getInt(3));
+            u.setRelacion(Conj_Registros.getInt(4));
+            u.setT_hijos(Conj_Registros.getString(5).charAt(0));
+            u.setQ_hijos(Conj_Registros.getString(6).charAt(0));
+            u.setDeporte(Conj_Registros.getInt(7));
+            u.setArte(Conj_Registros.getInt(8));
+            u.setPolitica(Conj_Registros.getInt(9));
         }
         return u;
     }
@@ -100,8 +101,8 @@ public class Conexion {
             Sentencia_SQL.executeUpdate(sentencia);
             System.out.println("USUARIO REGISTRADO 1 OK");
 
-            sentencia = "INSERT INTO preferencias (id, interes, relacion, t_hijos, q_hijos, deporte, arte, politica)"
-                    + "values('" + u.getId() + "', " + u.getInteres() + ", " + u.getRelacion() + ", '" + u.getT_hijos() + "',"
+            sentencia = "INSERT INTO preferencias (id, genero, interes, relacion, t_hijos, q_hijos, deporte, arte, politica)"
+                    + "values('" + u.getId() + "',"+u.getGenero()+" , " + u.getInteres() + ", " + u.getRelacion() + ", '" + u.getT_hijos() + "',"
                     + " '" + u.getQ_hijos() + "', " + u.getDeporte() + ", " + u.getArte() + ", " + u.getPolitica() + ")";
             Sentencia_SQL.executeUpdate(sentencia);
             System.out.println("USUARIO REGISTRADO 2 OK");
@@ -282,5 +283,14 @@ public class Conexion {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public void modPrefs(Usuario u) throws SQLException {
+        String sentencia = "update preferencias set interes = "+u.getInteres()+","
+                + " relacion = "+u.getRelacion()+", t_hijos = '"+u.getT_hijos()+"',"
+                + " q_hijos = '"+u.getQ_hijos()+"', deporte = "+u.getDeporte()+","
+                + " arte = "+u.getArte()+", politica = "+u.getPolitica()+""
+                + "  WHERE id = '" + u.getId() + "'";
+        Sentencia_SQL.executeUpdate(sentencia);
     }
 }

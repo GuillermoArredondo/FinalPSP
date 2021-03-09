@@ -26,7 +26,7 @@ public class VentanaUsuario extends javax.swing.JFrame {
     private Socket servidor;
     private PrivateKey clavePrivPropia;
     private PublicKey clavePubAjena;
-    private Usuario usu;
+    public static Usuario usu;
 
     public VentanaUsuario(Usuario usu, Socket servidor, PrivateKey clavePrivPropia, PublicKey clavePubAjena) {
         this.usu = usu;
@@ -113,6 +113,11 @@ public class VentanaUsuario extends javax.swing.JFrame {
         btnMostrarAfines.setText("Usuarios afines");
 
         btnEditPrefs.setText("Editar preferencias");
+        btnEditPrefs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditPrefsActionPerformed(evt);
+            }
+        });
 
         lblEmail.setText("prueba@prueba.com");
 
@@ -233,6 +238,14 @@ public class VentanaUsuario extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnEditPrefsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditPrefsActionPerformed
+        
+        VentanaPrefs vp = new VentanaPrefs(this, true, usu, servidor, clavePrivPropia, clavePubAjena);
+        vp.setVisible(true);
+        vp.setLocationRelativeTo(this);
+        
+    }//GEN-LAST:event_btnEditPrefsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

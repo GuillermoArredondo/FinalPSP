@@ -16,6 +16,7 @@ public class Usuario implements Serializable{
     private String nick;
     private int edad;
     private byte[] foto;
+    private int genero;
     private int interes;
     private int relacion;
     private char t_hijos;
@@ -26,7 +27,7 @@ public class Usuario implements Serializable{
     private int activo;
     
     public Usuario(String email, String pwd, String nick, int edad, byte[] foto,
-                   int interes, int relacion, char t_hijos,
+                   int genero, int interes, int relacion, char t_hijos,
                    char q_hijos, int deporte, int arte, int politica, int activo){
         
         this.id = generateId();
@@ -35,6 +36,7 @@ public class Usuario implements Serializable{
         this.nick = nick;
         this.edad = edad;
         this.foto = foto;
+        this.genero = genero;
         this.interes = interes;
         this.relacion = relacion;
         this.t_hijos = t_hijos;
@@ -78,6 +80,16 @@ public class Usuario implements Serializable{
         String uuid = UUID.randomUUID().toString();
         return uuid;
     }
+
+    public int getGenero() {
+        return genero;
+    }
+
+    public void setGenero(int genero) {
+        this.genero = genero;
+    }
+    
+    
 
     public int getActivo() {
         return activo;

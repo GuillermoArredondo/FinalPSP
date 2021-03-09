@@ -101,7 +101,8 @@ public class VentanaRegistro extends javax.swing.JFrame {
     
     public boolean checkPrefs(){
         boolean ok = true;
-        if (cbGeneros.getSelectedIndex() == 0 ||
+        if (cbGen.getSelectedIndex() == 0 ||
+            cbInteres.getSelectedIndex() == 0 ||
             cbRelacion.getSelectedIndex() == 0 ||
             cbTHijos.getSelectedIndex() == 0 ||
             cbQHijos.getSelectedIndex() == 0) {
@@ -137,8 +138,9 @@ public class VentanaRegistro extends javax.swing.JFrame {
         String pass2 = Seguridad.Hexadecimal(pass);
         
         return new Usuario(txtEmail.getText(), pass2,
-                txtNick.getText(), (int) spEdad.getValue(), null, 
-                cbGeneros.getSelectedIndex(),
+                txtNick.getText(), (int) spEdad.getValue(), null,
+                cbGen.getSelectedIndex(),
+                cbInteres.getSelectedIndex(),
                 cbRelacion.getSelectedIndex(),
                 th, qh, sldDeporte.getValue(),
                 sldArte.getValue(), sldPolitica.getValue(), 0);
@@ -195,7 +197,6 @@ public class VentanaRegistro extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        cbGeneros = new javax.swing.JComboBox<>();
         sldDeporte = new javax.swing.JSlider();
         cbRelacion = new javax.swing.JComboBox<>();
         jLabel12 = new javax.swing.JLabel();
@@ -211,6 +212,9 @@ public class VentanaRegistro extends javax.swing.JFrame {
         sldArte = new javax.swing.JSlider();
         btnRegistrar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
+        cbInteres = new javax.swing.JComboBox<>();
+        jLabel14 = new javax.swing.JLabel();
+        cbGen = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -264,8 +268,6 @@ public class VentanaRegistro extends javax.swing.JFrame {
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel11.setText("Interés por el arte:");
-
-        cbGeneros.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecciona una", "Hombres", "Mujeres", "Ambos" }));
 
         sldDeporte.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -328,6 +330,8 @@ public class VentanaRegistro extends javax.swing.JFrame {
             }
         });
 
+        cbInteres.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecciona una", "Hombres", "Mujeres", "Ambos" }));
+
         javax.swing.GroupLayout pnlPrefsUserLayout = new javax.swing.GroupLayout(pnlPrefsUser);
         pnlPrefsUser.setLayout(pnlPrefsUserLayout);
         pnlPrefsUserLayout.setHorizontalGroup(
@@ -344,9 +348,9 @@ public class VentanaRegistro extends javax.swing.JFrame {
                                     .addComponent(jLabel10))
                                 .addGap(18, 18, 18)
                                 .addGroup(pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(cbGeneros, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(cbRelacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cbRelacion, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cbInteres, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
                                 .addGroup(pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel16, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING))
@@ -376,7 +380,7 @@ public class VentanaRegistro extends javax.swing.JFrame {
                             .addComponent(lblPolitica)
                             .addComponent(lblArte)
                             .addComponent(lblDeporte))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
         pnlPrefsUserLayout.setVerticalGroup(
             pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -385,9 +389,9 @@ public class VentanaRegistro extends javax.swing.JFrame {
                 .addGap(23, 23, 23)
                 .addGroup(pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
-                    .addComponent(cbGeneros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel15)
-                    .addComponent(cbTHijos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbTHijos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbInteres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(pnlPrefsUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -423,6 +427,11 @@ public class VentanaRegistro extends javax.swing.JFrame {
                 .addGap(37, 37, 37))
         );
 
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel14.setText("Género:");
+
+        cbGen.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecciona una", "Hombre", "Mujer" }));
+
         javax.swing.GroupLayout pnlDatosUserLayout = new javax.swing.GroupLayout(pnlDatosUser);
         pnlDatosUser.setLayout(pnlDatosUserLayout);
         pnlDatosUserLayout.setHorizontalGroup(
@@ -430,34 +439,41 @@ public class VentanaRegistro extends javax.swing.JFrame {
             .addGroup(pnlDatosUserLayout.createSequentialGroup()
                 .addContainerGap(27, Short.MAX_VALUE)
                 .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDatosUserLayout.createSequentialGroup()
+                        .addComponent(btnFoto)
+                        .addGap(81, 81, 81))
                     .addGroup(pnlDatosUserLayout.createSequentialGroup()
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDatosUserLayout.createSequentialGroup()
                         .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(pnlDatosUserLayout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addGap(32, 32, 32)
+                                .addComponent(txtNick, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(pnlDatosUserLayout.createSequentialGroup()
                                 .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel9)
                                     .addComponent(jLabel8)
                                     .addComponent(jLabel1)
-                                    .addComponent(jLabel4))
-                                .addGap(32, 32, 32)
-                                .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtPass1, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtPass2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(spEdad, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(pnlDatosUserLayout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addGap(32, 32, 32)
-                                .addComponent(txtNick, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlDatosUserLayout.createSequentialGroup()
-                                .addGap(84, 84, 84)
-                                .addComponent(lblImaUser, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(65, 65, 65))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDatosUserLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnFoto)
-                                .addGap(96, 96, 96))))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jLabel14))
+                                .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(pnlDatosUserLayout.createSequentialGroup()
+                                        .addGap(33, 33, 33)
+                                        .addComponent(cbGen, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jLabel4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(spEdad, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDatosUserLayout.createSequentialGroup()
+                                        .addGap(32, 32, 32)
+                                        .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtPass2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtPass1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                        .addGap(40, 40, 40)
+                        .addComponent(lblImaUser, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(49, 49, 49))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDatosUserLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlPrefsUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -494,8 +510,10 @@ public class VentanaRegistro extends javax.swing.JFrame {
                 .addGroup(pnlDatosUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(spEdad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
-                    .addComponent(btnFoto))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+                    .addComponent(btnFoto)
+                    .addComponent(jLabel14)
+                    .addComponent(cbGen, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlPrefsUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -595,7 +613,8 @@ public class VentanaRegistro extends javax.swing.JFrame {
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnFoto;
     private javax.swing.JButton btnRegistrar;
-    private javax.swing.JComboBox<String> cbGeneros;
+    private javax.swing.JComboBox<String> cbGen;
+    private javax.swing.JComboBox<String> cbInteres;
     private javax.swing.JComboBox<String> cbQHijos;
     private javax.swing.JComboBox<String> cbRelacion;
     private javax.swing.JComboBox<String> cbTHijos;
@@ -605,6 +624,7 @@ public class VentanaRegistro extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
