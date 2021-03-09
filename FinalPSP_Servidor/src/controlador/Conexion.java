@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 import javax.swing.JOptionPane;
 
 /**
@@ -292,5 +293,72 @@ public class Conexion {
                 + " arte = "+u.getArte()+", politica = "+u.getPolitica()+""
                 + "  WHERE id = '" + u.getId() + "'";
         Sentencia_SQL.executeUpdate(sentencia);
+    }
+
+    public ArrayList<String> obtenerListaAmigos(String idUser) throws SQLException {
+        ArrayList<String> listaIds = new ArrayList<>();
+        ArrayList<String> listaAmigos = new ArrayList<>();
+        String sentencia = "SELECT id1, id2 FROM likes where (id1 = '"+idUser+"' or id2 = '"+idUser+"') and like_rec = 1" ;
+        Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+        while (Conj_Registros.next()) {
+            listaIds.add(Conj_Registros.getString(1));
+            listaIds.add(Conj_Registros.getString(2));
+        }
+        for (int i = 0; i < listaIds.size(); i++) {
+            if (!listaIds.get(i).equals(idUser)) {
+                listaAmigos.add(listaIds.get(i));
+            }
+        }
+        return listaAmigos;
+    }
+
+    public ArrayList<String> obtenerListaNicksAmigos(ArrayList<String> listaIdsAmigos) throws SQLException {
+        ArrayList<String> listaAmigos = new ArrayList<>();
+        for (int i = 0; i < listaIdsAmigos.size(); i++) {
+            String sentencia = "select nick from usuarios where id = '"+listaIdsAmigos.get(i)+"'";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while (Conj_Registros.next()) {
+                listaAmigos.add(Conj_Registros.getString(1));
+            }
+        }
+        return listaAmigos;
+        
+    }
+
+    public ArrayList<Usuario> obtenerAllUsers() throws SQLException {
+        ArrayList<String> listaIdsUsers = new ArrayList<>();
+        String sentencia = "select id from usuarios";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while (Conj_Registros.next()) {
+                listaIdsUsers.add(Conj_Registros.getString(1));
+            }
+        ArrayList<Usuario> listaUsuarios = new ArrayList<>();
+        for (int i = 0; i < listaIdsUsers.size(); i++) {
+            listaUsuarios.add(obtenerUsuario(listaIdsUsers.get(i)));
+        }
+        return listaUsuarios;
+    }
+
+    public boolean checkMatch(ArrayList<String> idsMegusta) throws SQLException {
+        String sentencia = "select like_rec from likes where (id1 = '"+idsMegusta.get(1)+"' and id2 = '"+idsMegusta.get(0)+"') or (id1 = '"+idsMegusta.get(0)+"' and id2 = '"+idsMegusta.get(1)+"')";
+        Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+        boolean ok = false;
+        while (Conj_Registros.next()) {
+                ok = true;
+        }
+        return ok;
+    }
+
+    public void doMatch(ArrayList<String> idsMegusta) throws SQLException {
+        String sentencia = "update likes set like_rec = 1 where (id1 = '"+idsMegusta.get(1)+"' and id2 = '"+idsMegusta.get(0)+"') or (id1 = '"+idsMegusta.get(0)+"' and id2 = '"+idsMegusta.get(1)+"')";
+        Sentencia_SQL.executeUpdate(sentencia);
+        System.out.println("doMatch");
+    }
+
+    public void crearMatch(ArrayList<String> idsMegusta) throws SQLException {
+        String id = UUID.randomUUID().toString();
+        String sentencia = "insert into likes values ('"+id+"', '"+idsMegusta.get(0)+"', '"+idsMegusta.get(1)+"', 0)";
+        Sentencia_SQL.executeUpdate(sentencia);
+        System.out.println("crearMatch");
     }
 }

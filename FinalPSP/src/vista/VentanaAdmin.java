@@ -441,10 +441,10 @@ public class VentanaAdmin extends javax.swing.JFrame {
     private void rellenarTablaAdmins() throws IOException, ClassNotFoundException {
         try {
 
-            SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
-            this.listaAdmins = (ArrayList<Usuario>) Seguridad.descifrar(clavePrivPropia, so);
+            //SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+            this.listaAdmins = (ArrayList<Usuario>) Comunicacion.recibirObjeto(servidor);
 
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | ClassNotFoundException | IllegalBlockSizeException | BadPaddingException ex) {
+        } catch (IOException | ClassNotFoundException  ex) {
             Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -468,14 +468,8 @@ public class VentanaAdmin extends javax.swing.JFrame {
 
     private void rellenarTablaUsuarios() throws IOException, ClassNotFoundException {
 
-        try {
-
-            SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
-            this.listaUsuarios = (ArrayList<Usuario>) Seguridad.descifrar(clavePrivPropia, so);
-
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            Logger.getLogger(VentanaAdmin.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+        this.listaUsuarios = (ArrayList<Usuario>) Comunicacion.recibirObjeto(servidor);
 
         DefaultTableModel modelo = new DefaultTableModel();
 

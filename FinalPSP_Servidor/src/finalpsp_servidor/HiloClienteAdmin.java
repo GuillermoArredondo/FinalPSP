@@ -141,14 +141,10 @@ class HiloClienteAdmin extends Thread {
 
     private void enviarListaAdmins() throws SQLException, IOException {
 
-        try {
-            ArrayList<Usuario> listaAdmin = obtenerAdmins();
-            SealedObject so;
-            so = Seguridad.cifrar(clavePubAjena, listaAdmin);
-            Comunicacion.enviarObjeto(cliente, so);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException ex) {
-            Logger.getLogger(HiloClienteAdmin.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ArrayList<Usuario> listaAdmin = obtenerAdmins();
+        SealedObject so;
+        //so = Seguridad.cifrar(clavePubAjena, listaAdmin);
+        Comunicacion.enviarObjeto(cliente, listaAdmin);
 
     }
 
@@ -157,9 +153,9 @@ class HiloClienteAdmin extends Thread {
         try {
             ArrayList<Usuario> listaUsuarios = obtenerUsuarios();
             SealedObject so;
-            so = Seguridad.cifrar(clavePubAjena, listaUsuarios);
-            Comunicacion.enviarObjeto(cliente, so);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException ex) {
+            //so = Seguridad.cifrar(clavePubAjena, listaUsuarios);
+            Comunicacion.enviarObjeto(cliente, listaUsuarios);
+        } catch (IOException ex) {
             Logger.getLogger(HiloClienteAdmin.class.getName()).log(Level.SEVERE, null, ex);
         }
 

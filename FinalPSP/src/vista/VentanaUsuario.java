@@ -6,16 +6,32 @@
 package vista;
 
 import Datos.Usuario;
+import Utilities.Comunicacion;
+import Utilities.Seguridad;
 import finalpsp.Constantes;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
 import javax.imageio.ImageIO;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import static vista.VentanaAdmin.listaUsuarios;
 
 /**
  *
@@ -27,6 +43,8 @@ public class VentanaUsuario extends javax.swing.JFrame {
     private PrivateKey clavePrivPropia;
     private PublicKey clavePubAjena;
     public static Usuario usu;
+    private ArrayList<String> amigosList;
+    private ArrayList<Usuario> listaUsuarios;
 
     public VentanaUsuario(Usuario usu, Socket servidor, PrivateKey clavePrivPropia, PublicKey clavePubAjena) {
         this.usu = usu;
@@ -34,6 +52,8 @@ public class VentanaUsuario extends javax.swing.JFrame {
         this.clavePrivPropia = clavePrivPropia;
         this.clavePubAjena = clavePubAjena;
         initComponents();
+        rellenarListaAmigos();
+        rellenarListaUsuarios();
         cargarDatosUsu();
         setIconImage(Constantes.RUTA_IMA_USER);
 
@@ -122,6 +142,11 @@ public class VentanaUsuario extends javax.swing.JFrame {
         lblEmail.setText("prueba@prueba.com");
 
         btnLike.setText("Marcar Like");
+        btnLike.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLikeActionPerformed(evt);
+            }
+        });
 
         btnDislike.setText("Desmarcar Like");
 
@@ -240,12 +265,46 @@ public class VentanaUsuario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditPrefsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditPrefsActionPerformed
-        
+
         VentanaPrefs vp = new VentanaPrefs(this, true, usu, servidor, clavePrivPropia, clavePubAjena);
         vp.setVisible(true);
         vp.setLocationRelativeTo(this);
-        
+
     }//GEN-LAST:event_btnEditPrefsActionPerformed
+
+    private void btnLikeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLikeActionPerformed
+        
+        if (tableUsuarios.getSelectedRow() != -1) {
+            
+            try {
+                
+                //envio la orden al servidor
+                int orden = 1;
+                SealedObject so =Seguridad.cifrar(this.clavePubAjena, orden);
+                Comunicacion.enviarObjeto(servidor, so);
+                
+                //creo el me gusta con los ids y lo envio
+                ArrayList<String> idsMegusta = new ArrayList<String>();
+                idsMegusta.add(this.usu.getId());
+                idsMegusta.add(listaUsuarios.get(tableUsuarios.getSelectedRow()).getId());
+                
+                so = Seguridad.cifrar(clavePubAjena, idsMegusta);
+                Comunicacion.enviarObjeto(servidor, so);
+                
+                JOptionPane.showMessageDialog(null, "Usuario marcado como me gusta");
+                //espero la respuesta
+                rellenarListaAmigos();
+                
+                
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException ex) {
+                Logger.getLogger(VentanaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }else{
+            JOptionPane.showMessageDialog(null, "Debes seleccionar un usuario");
+        }
+        
+    }//GEN-LAST:event_btnLikeActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -292,5 +351,62 @@ public class VentanaUsuario extends javax.swing.JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void rellenarListaAmigos() {
+
+        try {
+
+            SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+            this.amigosList = (ArrayList<String>) Seguridad.descifrar(clavePrivPropia, so);
+
+            DefaultListModel model = new DefaultListModel();
+
+            for (int i = 0; i < amigosList.size(); i++) {
+                model.addElement(amigosList.get(i));
+            }
+
+            listAmigos.setModel(model);
+
+        } catch (IOException | ClassNotFoundException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
+            Logger.getLogger(VentanaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void rellenarListaUsuarios() {
+
+        try {
+
+            //SealedObject so = (SealedObject) Comunicacion.recibirObjeto(servidor);
+            this.listaUsuarios = (ArrayList<Usuario>) Comunicacion.recibirObjeto(servidor);
+
+            DefaultTableModel modelo = new DefaultTableModel();
+
+            modelo.addColumn("Nick");
+            modelo.addColumn("Edad");
+            modelo.addColumn("Genero");
+            
+
+            Object[] o = new Object[3];
+            for (int i = 0; i < listaUsuarios.size(); i++) {
+                o[0] = listaUsuarios.get(i).getNick();
+                o[1] = listaUsuarios.get(i).getEdad();
+                //o[2] = listaUsuarios.get(i).getGenero();
+                if (listaUsuarios.get(i).getGenero() == 1) {
+                    o[2] = "Hombre";
+                } else {
+                    o[2] = "Mujer";
+                }
+
+                modelo.addRow(o);
+            }
+            tableUsuarios.setModel(modelo);
+            tableUsuarios.setDefaultEditor(Object.class, null);
+
+        } catch (IOException | ClassNotFoundException  ex) {
+            Logger.getLogger(VentanaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }
