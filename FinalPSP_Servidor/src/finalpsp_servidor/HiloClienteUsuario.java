@@ -51,7 +51,7 @@ class HiloClienteUsuario extends Thread{
             //enviar lista de usuarios
             enviarListaUsuarios();
             
-            
+            boolean activo = true;
             do {
                 
                 try {
@@ -101,6 +101,15 @@ class HiloClienteUsuario extends Thread{
                             
                             break;
                             
+                        case 4:
+                            //recibo los ids de los Users
+                            so = (SealedObject) Comunicacion.recibirObjeto(cliente);
+                            ArrayList<String> idsUsers = (ArrayList<String>) Seguridad.descifrar(clavePrivPropia, so);
+                            HiloChat hc = new HiloChat(idsUsers, cliente, clavePrivPropia, clavePubAjena, con);
+                            hc.start();
+                            activo = false;
+                            break;
+                            
                     }
                     
                     
@@ -109,7 +118,7 @@ class HiloClienteUsuario extends Thread{
                     Logger.getLogger(HiloClienteUsuario.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-            } while (true);
+            } while (activo);
         } catch (SQLException | IOException  ex) {
             Logger.getLogger(HiloClienteUsuario.class.getName()).log(Level.SEVERE, null, ex);
         }

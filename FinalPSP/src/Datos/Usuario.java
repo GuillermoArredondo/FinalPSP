@@ -77,8 +77,19 @@ public class Usuario implements Serializable{
     }
 
     public static String generateId() {
-        String uuid = UUID.randomUUID().toString();
-        return uuid;
+        String letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String numeros = "0123456789";
+        char[] rand = new char[10];
+        for (int i = 0; i < 10; i++) {
+            int r = (int) (Math.random() * 2);
+            if (r == 1) {
+                rand[i] = letras.charAt((int) (Math.random() * 51));
+            }else{
+                rand[i] = numeros.charAt((int) (Math.random() * 9));
+            }
+        }
+        String str = new String(rand);
+        return str;
     }
 
     public int getGenero() {

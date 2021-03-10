@@ -1,5 +1,6 @@
 package controlador;
 
+import Datos.Chat;
 import Datos.Usuario;
 import Utilities.Seguridad;
 import com.sun.javafx.scene.control.skin.FXVK;
@@ -399,4 +400,73 @@ public class Conexion {
             }
         return listaPorGenero;  
     }
+
+    public boolean existeChat(ArrayList<String> idsUsers) {
+        boolean existe = false;
+        try{
+            String sentencia = "select id from "+idsUsers.get(0)+"_"+idsUsers.get(1)+"";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while (Conj_Registros.next()) {
+                existe = true;
+                System.out.println("EXISTE CHAT");
+            }
+            
+        }catch(Exception e){
+            
+        }
+        return existe;
+        
+    }
+
+    public void crearChat(ArrayList<String> idsUsers) throws SQLException {
+        String sentencia = "create table "+idsUsers.get(0)+"_"+idsUsers.get(1)+" (id int AUTO_INCREMENT, id_u varchar(50), msg varchar(200), PRIMARY KEY (id))";
+        Sentencia_SQL.executeUpdate(sentencia);
+        sentencia = "insert into "+idsUsers.get(0)+"_"+idsUsers.get(1)+"(id, id_u, msg) values (1, '"+idsUsers.get(0)+"', '')";
+        Sentencia_SQL.executeUpdate(sentencia);
+        System.out.println("CREO CHAT");
+    }
+
+    public Chat ObtenerChat(ArrayList<String> idsUsers) throws SQLException {
+        
+        ArrayList<String> listaNicks = new ArrayList<>();
+        ArrayList<String> msgs = new ArrayList<>();
+        
+        listaNicks = obtenerListaNicksAmigos(idsUsers);
+        int numMsg = 0;
+        
+        String sentencia = "select count(msg) from "+idsUsers.get(0)+"_"+idsUsers.get(1)+"";
+        Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while (Conj_Registros.next()) {
+                numMsg = Conj_Registros.getInt(1);
+            }
+        ArrayList<String> listaNicksDefs = new ArrayList<>();
+        
+            sentencia = "select id_u, msg from "+idsUsers.get(0)+"_"+idsUsers.get(1)+"";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while (Conj_Registros.next()) {
+                String id_u = Conj_Registros.getString(1);
+                if (id_u.equals(idsUsers.get(0))) {
+                    id_u = listaNicks.get(0);
+                }else{
+                    id_u = listaNicks.get(1);
+                }
+                String msg = Conj_Registros.getString(2);
+                listaNicksDefs.add(id_u);
+                msgs.add(msg);
+            }
+        
+        
+        System.out.println("OBTENGO CHAT");
+        
+        
+        return new Chat(listaNicksDefs, msgs);
+    }
+
+    public void enviarMensage(ArrayList<String> idsUsers, String msg, String miId) throws SQLException {
+        
+        String sentencia = "insert into "+idsUsers.get(0)+"_"+idsUsers.get(1)+" (id_u, msg) values ('"+miId+"', '"+msg+"' )";
+        Sentencia_SQL.executeUpdate(sentencia);
+        
+    }
+
 }
