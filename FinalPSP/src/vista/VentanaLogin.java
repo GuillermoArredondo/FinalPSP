@@ -217,7 +217,7 @@ public class VentanaLogin extends javax.swing.JFrame {
                     case 0:
                         so = (SealedObject) Comunicacion.recibirObjeto(servidor);
                         Usuario admin = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
-                        JOptionPane.showMessageDialog(null, "ADMIN: " + admin.getNick());
+                        JOptionPane.showMessageDialog(null, "Entrando como ADMIN: " + admin.getNick());
                         VentanaAdmin va = new VentanaAdmin(admin, servidor, clavePrivPropia, clavePubAjena);
                         va.setVisible(true);
                         va.setLocationRelativeTo(null);
@@ -226,20 +226,20 @@ public class VentanaLogin extends javax.swing.JFrame {
                     case 1:
                         so = (SealedObject) Comunicacion.recibirObjeto(servidor);
                         Usuario usu = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
-                        JOptionPane.showMessageDialog(null, "USUARIO ACTIVO: " + usu.getNick());
+                        JOptionPane.showMessageDialog(null, "Login correcto, Bienvenido " + usu.getNick());
                         VentanaUsuario vu = new VentanaUsuario(usu, servidor, clavePrivPropia, clavePubAjena);
                         vu.setVisible(true);
                         vu.setLocationRelativeTo(null);
                         this.dispose();
                         break;
                     case 2:
-                        JOptionPane.showMessageDialog(null, "USUARIO NO ACTIVO");
+                        JOptionPane.showMessageDialog(null, "El usuario no está activo");
                         break;
                     case 3:
-                        JOptionPane.showMessageDialog(null, "LA PASS NO COINCIDE");
+                        JOptionPane.showMessageDialog(null, "La contraseña es incorrecta");
                         break;
                     case 4:
-                        JOptionPane.showMessageDialog(null, "NO EXISTE EL EMAIL");
+                        JOptionPane.showMessageDialog(null, "El email introducido no existe");
                         break;
                 }
 

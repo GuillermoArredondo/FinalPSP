@@ -165,7 +165,7 @@ public class VentanaChat extends javax.swing.JFrame {
         try {
 
             if (!txtChat.getText().isEmpty()) {
-                txtChat.setText("");
+                
                 //envio orden
                 int orden = 0;
                 SealedObject so = Seguridad.cifrar(clavePubAjena, orden);
@@ -180,7 +180,7 @@ public class VentanaChat extends javax.swing.JFrame {
                 Comunicacion.enviarObjeto(servidor, so);
                 //recibo datos
                 rellenarChat();
-
+                txtChat.setText("");
             } else {
                 JOptionPane.showMessageDialog(null, "El mensage esta vacio");
             }
