@@ -86,7 +86,6 @@ public class VentanaUsuario extends javax.swing.JFrame {
         btnEditPrefs = new javax.swing.JButton();
         lblEmail = new javax.swing.JLabel();
         btnLike = new javax.swing.JButton();
-        btnDislike = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         btnChat = new javax.swing.JButton();
         btnVerPrefs = new javax.swing.JButton();
@@ -114,6 +113,11 @@ public class VentanaUsuario extends javax.swing.JFrame {
         jScrollPane2.setViewportView(listAmigos);
 
         btnMostrarTodos.setText("Todos los usuarios");
+        btnMostrarTodos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMostrarTodosActionPerformed(evt);
+            }
+        });
 
         txtChat.setColumns(20);
         txtChat.setRows(5);
@@ -131,6 +135,11 @@ public class VentanaUsuario extends javax.swing.JFrame {
         lblNick.setText("Prueba");
 
         btnMostrarAfines.setText("Usuarios afines");
+        btnMostrarAfines.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMostrarAfinesActionPerformed(evt);
+            }
+        });
 
         btnEditPrefs.setText("Editar preferencias");
         btnEditPrefs.addActionListener(new java.awt.event.ActionListener() {
@@ -148,13 +157,16 @@ public class VentanaUsuario extends javax.swing.JFrame {
             }
         });
 
-        btnDislike.setText("Desmarcar Like");
-
         jLabel8.setText("Mostrar en la lista:");
 
         btnChat.setText("Chat");
 
         btnVerPrefs.setText("Ver gustos");
+        btnVerPrefs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVerPrefsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -177,13 +189,12 @@ public class VentanaUsuario extends javax.swing.JFrame {
                                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(btnEditPrefs, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(23, 23, 23)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(66, 66, 66)
                                         .addComponent(btnLike, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(btnDislike)
-                                        .addGap(12, 12, 12)
-                                        .addComponent(btnVerPrefs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGap(18, 18, 18)
+                                        .addComponent(btnVerPrefs, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -230,7 +241,6 @@ public class VentanaUsuario extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(btnEditPrefs, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnDislike, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnLike, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnVerPrefs, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(btnChat, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -306,10 +316,62 @@ public class VentanaUsuario extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnLikeActionPerformed
 
+    private void btnVerPrefsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerPrefsActionPerformed
+        
+        if (tableUsuarios.getSelectedRow() != -1) {
+            
+            VentanaGustos vg = new VentanaGustos(this, true, listaUsuarios.get(tableUsuarios.getSelectedRow()));
+            vg.setVisible(true);
+            vg.setLocationRelativeTo(this);
+            
+        }else{
+             JOptionPane.showMessageDialog(null, "Debes seleccionar un usuario para ver sus gustos");
+        }
+        
+    }//GEN-LAST:event_btnVerPrefsActionPerformed
+
+    private void btnMostrarAfinesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarAfinesActionPerformed
+        
+        try {
+            
+            //envio la orden al servidor
+            int orden = 2;
+            SealedObject so =Seguridad.cifrar(this.clavePubAjena, orden);
+            Comunicacion.enviarObjeto(servidor, so);
+            
+            //envio el usuario
+            so = Seguridad.cifrar(clavePubAjena, this.usu);
+            Comunicacion.enviarObjeto(servidor, so);
+            
+            rellenarListaUsuarios();
+            
+            
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException ex) {
+            Logger.getLogger(VentanaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_btnMostrarAfinesActionPerformed
+
+    private void btnMostrarTodosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMostrarTodosActionPerformed
+        
+        try {
+            
+            //envio la orden al servidor
+            int orden = 3;
+            SealedObject so =Seguridad.cifrar(this.clavePubAjena, orden);
+            Comunicacion.enviarObjeto(servidor, so);
+            
+            rellenarListaUsuarios();
+            
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IOException | IllegalBlockSizeException ex) {
+            Logger.getLogger(VentanaUsuario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_btnMostrarTodosActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChat;
-    private javax.swing.JButton btnDislike;
     private javax.swing.JButton btnEditPrefs;
     private javax.swing.JButton btnLike;
     private javax.swing.JButton btnMostrarAfines;

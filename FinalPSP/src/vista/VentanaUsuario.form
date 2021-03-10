@@ -57,13 +57,12 @@
                                       <Component id="btnEditPrefs" alignment="0" min="-2" pref="131" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="-2" pref="66" max="-2" attributes="0"/>
                                           <Component id="btnLike" min="-2" pref="110" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="btnDislike" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                                          <Component id="btnVerPrefs" max="32767" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Component id="btnVerPrefs" min="-2" pref="106" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="jScrollPane1" min="-2" pref="350" max="-2" attributes="0"/>
                                   </Group>
@@ -128,7 +127,6 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="btnEditPrefs" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
-                          <Component id="btnDislike" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                           <Component id="btnLike" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                           <Component id="btnVerPrefs" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                       </Group>
@@ -208,6 +206,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Todos los usuarios"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMostrarTodosActionPerformed"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane3">
           <AuxValues>
@@ -256,6 +257,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Usuarios afines"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMostrarAfinesActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnEditPrefs">
           <Properties>
@@ -278,11 +282,6 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLikeActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="btnDislike">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Desmarcar Like"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
           <Properties>
             <Property name="text" type="java.lang.String" value="Mostrar en la lista:"/>
@@ -297,6 +296,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Ver gustos"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnVerPrefsActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

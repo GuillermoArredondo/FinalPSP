@@ -62,8 +62,9 @@ class HiloClienteUsuario extends Thread{
                     
                     //orden 0 -> Modificar preferencias del usuario
                     //      1 -> Marcar me gusta
-                    //      2 -> Quitar me gusta
-                    //
+                    //      2 -> Mostrar usuarios afines
+                    //      3 -> Mostrar todos los usuarios
+                    
                     switch (orden){
                         case 0:
                             //recibo el usu a modificar
@@ -86,9 +87,18 @@ class HiloClienteUsuario extends Thread{
                             break;
                             
                         case 2:
+                            //recibo el usuario con el que voy a filtrar
+                            so = (SealedObject) Comunicacion.recibirObjeto(cliente);
+                            u = (Usuario) Seguridad.descifrar(clavePrivPropia, so);
+                            ArrayList<Usuario> listaFiltrada = crearListaFiltrada(u);
+                            Comunicacion.enviarObjeto(cliente, listaFiltrada);
+                            
+                            
                             break;
                             
                         case 3:
+                            enviarListaUsuarios();
+                            
                             break;
                             
                     }
@@ -163,8 +173,11 @@ class HiloClienteUsuario extends Thread{
         this.con.cerrarConexion();
     }
 
-    private void hacerMatch(ArrayList<String> idsMegusta) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private ArrayList<Usuario> crearListaFiltrada(Usuario u) throws SQLException {
+        this.con.abrirConexion();
+        ArrayList<Usuario> listaFiltrada = this.con.crearListaFiltrada(u);
+        this.con.cerrarConexion();
+        return listaFiltrada;
     }
     
 }

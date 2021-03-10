@@ -361,4 +361,42 @@ public class Conexion {
         Sentencia_SQL.executeUpdate(sentencia);
         System.out.println("crearMatch");
     }
+
+    public ArrayList<Usuario> crearListaFiltrada(Usuario u) throws SQLException {
+        
+        ArrayList<String> listaGen = obtenerPorGenero(u.getInteres());
+        ArrayList<String> listaFilt = new ArrayList<String>();
+        
+        for (int i = 0; i < listaGen.size(); i++) {
+            String sentencia = "select id from preferencias where id = '"+listaGen.get(i)+"'"
+                    + " and relacion = "+u.getRelacion()+""
+                    + " and t_hijos = '"+u.getT_hijos()+"'"
+                    + " and q_hijos ='"+u.getQ_hijos()+"'"
+                    + " and (deporte between "+(u.getDeporte()-30)+" and "+(u.getDeporte()+30)+")"
+                    + " and (deporte between "+(u.getArte()-30)+" and "+(u.getArte()+30)+")"
+                    + " and (deporte between "+(u.getPolitica()-30)+" and "+(u.getPolitica()+30)+")";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while (Conj_Registros.next()) {
+                listaFilt.add(Conj_Registros.getString(1));
+            }
+        }
+        
+        ArrayList<Usuario> listaUsus = new ArrayList<Usuario>();
+        
+        for (int i = 0; i < listaFilt.size(); i++) {
+            listaUsus.add(obtenerUsuario(listaFilt.get(i)));
+        }
+        
+        return listaUsus;
+    }
+    
+    private ArrayList<String> obtenerPorGenero(int gen) throws SQLException{
+        ArrayList<String> listaPorGenero = new ArrayList<>();
+        String sentencia = "select id from preferencias where genero = "+gen+"";
+            Conj_Registros = Sentencia_SQL.executeQuery(sentencia);
+            while (Conj_Registros.next()) {
+                listaPorGenero.add(Conj_Registros.getString(1));
+            }
+        return listaPorGenero;  
+    }
 }
